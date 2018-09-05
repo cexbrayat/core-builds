@@ -1,6 +1,6 @@
 /**
- * @license Angular v5.1.0-beta.0-21bfaf226
- * (c) 2010-2017 Google, Inc. https://angular.io/
+ * @license Angular v7.0.0-beta.4-a2418a9037
+ * (c) 2010-2018 Google, Inc. https://angular.io/
  * License: MIT
  */
 (function (global, factory) {
@@ -25,9 +25,12 @@ and limitations under the License.
 ***************************************************************************** */
 /* global Reflect, Promise */
 
-var extendStatics = Object.setPrototypeOf ||
-    ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-    function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+var extendStatics = function(d, b) {
+    extendStatics = Object.setPrototypeOf ||
+        ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
+        function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+    return extendStatics(d, b);
+};
 
 function __extends(d, b) {
     extendStatics(d, b);
@@ -35,9 +38,20 @@ function __extends(d, b) {
     d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
 }
 
+
+
+
+
+function __decorate(decorators, target, key, desc) {
+    var c = arguments.length, r = c < 3 ? target : desc === null ? desc = Object.getOwnPropertyDescriptor(target, key) : desc, d;
+    if (typeof Reflect === "object" && typeof Reflect.decorate === "function") r = Reflect.decorate(decorators, target, key, desc);
+    else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
+    return c > 3 && r && Object.defineProperty(target, key, r), r;
+}
+
 /**
- * @license Angular v5.1.0-beta.0-21bfaf226
- * (c) 2010-2017 Google, Inc. https://angular.io/
+ * @license Angular v7.0.0-beta.4-a2418a9037
+ * (c) 2010-2018 Google, Inc. https://angular.io/
  * License: MIT
  */
 /**
@@ -63,9 +77,9 @@ var _global = (typeof window === 'undefined' ? global : window);
  * });
  * ```
  *
- * @stable
+ *
  */
-function async(fn) {
+function asyncFallback(fn) {
     // If we're running using the Jasmine test framework, adapt to call the 'done'
     // function when asynchronous activity is finished.
     if (_global.jasmine) {
@@ -149,11 +163,53 @@ function runInTestZone(fn, context, finishCallback, failCallback) {
  * found in the LICENSE file at https://angular.io/license
  */
 /**
+ * Wraps a test function in an asynchronous test zone. The test will automatically
+ * complete when all asynchronous calls within this zone are done. Can be used
+ * to wrap an {@link inject} call.
+ *
+ * Example:
+ *
+ * ```
+ * it('...', async(inject([AClass], (object) => {
+ *   object.doSomething.then(() => {
+ *     expect(...);
+ *   })
+ * });
+ * ```
+ *
+ *
+ */
+function async(fn) {
+    var _Zone = typeof Zone !== 'undefined' ? Zone : null;
+    if (!_Zone) {
+        return function () {
+            return Promise.reject('Zone is needed for the async() test helper but could not be found. ' +
+                'Please make sure that your environment includes zone.js/dist/zone.js');
+        };
+    }
+    var asyncTest = _Zone && _Zone[_Zone.__symbol__('asyncTest')];
+    if (typeof asyncTest === 'function') {
+        return asyncTest(fn);
+    }
+    // not using new version of zone.js
+    // TODO @JiaLiPassion, remove this after all library updated to
+    // newest version of zone.js(0.8.25)
+    return asyncFallback(fn);
+}
+
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
  * Fixture for debugging and testing a component.
  *
- * @stable
+ *
  */
-var ComponentFixture = (function () {
+var ComponentFixture = /** @class */ (function () {
     function ComponentFixture(componentRef, ngZone, _autoDetect) {
         var _this = this;
         this.componentRef = componentRef;
@@ -183,8 +239,6 @@ var ComponentFixture = (function () {
                 _this._onMicrotaskEmptySubscription = ngZone.onMicrotaskEmpty.subscribe({
                     next: function () {
                         if (_this._autoDetect) {
-                            // Do a change detection run with checkNoChanges set to true to check
-                            // there are no changes on the second run.
                             // Do a change detection run with checkNoChanges set to true to check
                             // there are no changes on the second run.
                             _this.detectChanges(true);
@@ -225,13 +279,7 @@ var ComponentFixture = (function () {
     /**
      * Trigger a change detection cycle for the component.
      */
-    /**
-       * Trigger a change detection cycle for the component.
-       */
-    ComponentFixture.prototype.detectChanges = /**
-       * Trigger a change detection cycle for the component.
-       */
-    function (checkNoChanges) {
+    ComponentFixture.prototype.detectChanges = function (checkNoChanges) {
         var _this = this;
         if (checkNoChanges === void 0) { checkNoChanges = true; }
         if (this.ngZone != null) {
@@ -247,29 +295,13 @@ var ComponentFixture = (function () {
     /**
      * Do a change detection run to make sure there were no changes.
      */
-    /**
-       * Do a change detection run to make sure there were no changes.
-       */
-    ComponentFixture.prototype.checkNoChanges = /**
-       * Do a change detection run to make sure there were no changes.
-       */
-    function () { this.changeDetectorRef.checkNoChanges(); };
+    ComponentFixture.prototype.checkNoChanges = function () { this.changeDetectorRef.checkNoChanges(); };
     /**
      * Set whether the fixture should autodetect changes.
      *
      * Also runs detectChanges once so that any existing change is detected.
      */
-    /**
-       * Set whether the fixture should autodetect changes.
-       *
-       * Also runs detectChanges once so that any existing change is detected.
-       */
-    ComponentFixture.prototype.autoDetectChanges = /**
-       * Set whether the fixture should autodetect changes.
-       *
-       * Also runs detectChanges once so that any existing change is detected.
-       */
-    function (autoDetect) {
+    ComponentFixture.prototype.autoDetectChanges = function (autoDetect) {
         if (autoDetect === void 0) { autoDetect = true; }
         if (this.ngZone == null) {
             throw new Error('Cannot call autoDetectChanges when ComponentFixtureNoNgZone is set');
@@ -281,34 +313,14 @@ var ComponentFixture = (function () {
      * Return whether the fixture is currently stable or has async tasks that have not been completed
      * yet.
      */
-    /**
-       * Return whether the fixture is currently stable or has async tasks that have not been completed
-       * yet.
-       */
-    ComponentFixture.prototype.isStable = /**
-       * Return whether the fixture is currently stable or has async tasks that have not been completed
-       * yet.
-       */
-    function () { return this._isStable && !this.ngZone.hasPendingMacrotasks; };
+    ComponentFixture.prototype.isStable = function () { return this._isStable && !this.ngZone.hasPendingMacrotasks; };
     /**
      * Get a promise that resolves when the fixture is stable.
      *
      * This can be used to resume testing after events have triggered asynchronous activity or
      * asynchronous change detection.
      */
-    /**
-       * Get a promise that resolves when the fixture is stable.
-       *
-       * This can be used to resume testing after events have triggered asynchronous activity or
-       * asynchronous change detection.
-       */
-    ComponentFixture.prototype.whenStable = /**
-       * Get a promise that resolves when the fixture is stable.
-       *
-       * This can be used to resume testing after events have triggered asynchronous activity or
-       * asynchronous change detection.
-       */
-    function () {
+    ComponentFixture.prototype.whenStable = function () {
         var _this = this;
         if (this.isStable()) {
             return Promise.resolve(false);
@@ -330,13 +342,7 @@ var ComponentFixture = (function () {
     /**
       * Get a promise that resolves when the ui state is stable following animations.
       */
-    /**
-        * Get a promise that resolves when the ui state is stable following animations.
-        */
-    ComponentFixture.prototype.whenRenderingDone = /**
-        * Get a promise that resolves when the ui state is stable following animations.
-        */
-    function () {
+    ComponentFixture.prototype.whenRenderingDone = function () {
         var renderer = this._getRenderer();
         if (renderer && renderer.whenRenderingDone) {
             return renderer.whenRenderingDone();
@@ -346,13 +352,7 @@ var ComponentFixture = (function () {
     /**
      * Trigger component destruction.
      */
-    /**
-       * Trigger component destruction.
-       */
-    ComponentFixture.prototype.destroy = /**
-       * Trigger component destruction.
-       */
-    function () {
+    ComponentFixture.prototype.destroy = function () {
         if (!this._isDestroyed) {
             this.componentRef.destroy();
             if (this._onUnstableSubscription != null) {
@@ -387,8 +387,13 @@ function scheduleMicroTask(fn) {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-var FakeAsyncTestZoneSpec = Zone['FakeAsyncTestZoneSpec'];
-var ProxyZoneSpec = Zone['ProxyZoneSpec'];
+/**
+ * fakeAsync has been moved to zone.js
+ * this file is for fallback in case old version of zone.js is used
+ */
+var _Zone$1 = typeof Zone !== 'undefined' ? Zone : null;
+var FakeAsyncTestZoneSpec = _Zone$1 && _Zone$1['FakeAsyncTestZoneSpec'];
+var ProxyZoneSpec = _Zone$1 && _Zone$1['ProxyZoneSpec'];
 var _fakeAsyncTestZoneSpec = null;
 /**
  * Clears out the shared fake async zone for a test.
@@ -396,9 +401,10 @@ var _fakeAsyncTestZoneSpec = null;
  *
  * @experimental
  */
-function resetFakeAsyncZone() {
+function resetFakeAsyncZoneFallback() {
     _fakeAsyncTestZoneSpec = null;
-    ProxyZoneSpec.assertPresent().resetDelegate();
+    // in node.js testing we may not have ProxyZoneSpec in which case there is nothing to reset.
+    ProxyZoneSpec && ProxyZoneSpec.assertPresent().resetDelegate();
 }
 var _inFakeAsyncCall = false;
 /**
@@ -410,16 +416,17 @@ var _inFakeAsyncCall = false;
  *
  * Can be used to wrap inject() calls.
  *
- * ## Example
+ * @usageNotes
+ * ### Example
  *
- * {@example testing/ts/fake_async.ts region='basic'}
+ * {@example core/testing/ts/fake_async.ts region='basic'}
  *
  * @param fn
  * @returns The function wrapped to be executed in the fakeAsync zone
  *
  * @experimental
  */
-function fakeAsync(fn) {
+function fakeAsyncFallback(fn) {
     // Not using an arrow function to preserve context passed from call site
     return function () {
         var args = [];
@@ -443,7 +450,7 @@ function fakeAsync(fn) {
             proxyZoneSpec.setDelegate(_fakeAsyncTestZoneSpec);
             try {
                 res = fn.apply(this, args);
-                flushMicrotasks();
+                flushMicrotasksFallback();
             }
             finally {
                 proxyZoneSpec.setDelegate(lastProxyZoneSpec);
@@ -459,7 +466,7 @@ function fakeAsync(fn) {
         }
         finally {
             _inFakeAsyncCall = false;
-            resetFakeAsyncZone();
+            resetFakeAsyncZoneFallback();
         }
     };
 }
@@ -475,13 +482,14 @@ function _getFakeAsyncZoneSpec() {
  * The microtasks queue is drained at the very start of this function and after any timer callback
  * has been executed.
  *
- * ## Example
+ * @usageNotes
+ * ### Example
  *
- * {@example testing/ts/fake_async.ts region='basic'}
+ * {@example core/testing/ts/fake_async.ts region='basic'}
  *
  * @experimental
  */
-function tick(millis) {
+function tickFallback(millis) {
     if (millis === void 0) { millis = 0; }
     _getFakeAsyncZoneSpec().tick(millis);
 }
@@ -495,7 +503,7 @@ function tick(millis) {
  *
  * @experimental
  */
-function flush(maxTurns) {
+function flushFallback(maxTurns) {
     return _getFakeAsyncZoneSpec().flush(maxTurns);
 }
 /**
@@ -503,9 +511,8 @@ function flush(maxTurns) {
  *
  * @experimental
  */
-function discardPeriodicTasks() {
+function discardPeriodicTasksFallback() {
     var zoneSpec = _getFakeAsyncZoneSpec();
-    var pendingTimers = zoneSpec.pendingPeriodicTimers;
     zoneSpec.pendingPeriodicTimers.length = 0;
 }
 /**
@@ -513,8 +520,125 @@ function discardPeriodicTasks() {
  *
  * @experimental
  */
-function flushMicrotasks() {
+function flushMicrotasksFallback() {
     _getFakeAsyncZoneSpec().flushMicrotasks();
+}
+
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+var _Zone = typeof Zone !== 'undefined' ? Zone : null;
+var fakeAsyncTestModule = _Zone && _Zone[_Zone.__symbol__('fakeAsyncTest')];
+/**
+ * Clears out the shared fake async zone for a test.
+ * To be called in a global `beforeEach`.
+ *
+ * @experimental
+ */
+function resetFakeAsyncZone() {
+    if (fakeAsyncTestModule) {
+        return fakeAsyncTestModule.resetFakeAsyncZone();
+    }
+    else {
+        return resetFakeAsyncZoneFallback();
+    }
+}
+/**
+ * Wraps a function to be executed in the fakeAsync zone:
+ * - microtasks are manually executed by calling `flushMicrotasks()`,
+ * - timers are synchronous, `tick()` simulates the asynchronous passage of time.
+ *
+ * If there are any pending timers at the end of the function, an exception will be thrown.
+ *
+ * Can be used to wrap inject() calls.
+ *
+ * @usageNotes
+ * ### Example
+ *
+ * {@example core/testing/ts/fake_async.ts region='basic'}
+ *
+ * @param fn
+ * @returns The function wrapped to be executed in the fakeAsync zone
+ *
+ * @experimental
+ */
+function fakeAsync(fn) {
+    if (fakeAsyncTestModule) {
+        return fakeAsyncTestModule.fakeAsync(fn);
+    }
+    else {
+        return fakeAsyncFallback(fn);
+    }
+}
+/**
+ * Simulates the asynchronous passage of time for the timers in the fakeAsync zone.
+ *
+ * The microtasks queue is drained at the very start of this function and after any timer callback
+ * has been executed.
+ *
+ * @usageNotes
+ * ### Example
+ *
+ * {@example core/testing/ts/fake_async.ts region='basic'}
+ *
+ * @experimental
+ */
+function tick(millis) {
+    if (millis === void 0) { millis = 0; }
+    if (fakeAsyncTestModule) {
+        return fakeAsyncTestModule.tick(millis);
+    }
+    else {
+        return tickFallback(millis);
+    }
+}
+/**
+ * Simulates the asynchronous passage of time for the timers in the fakeAsync zone by
+ * draining the macrotask queue until it is empty. The returned value is the milliseconds
+ * of time that would have been elapsed.
+ *
+ * @param maxTurns
+ * @returns The simulated time elapsed, in millis.
+ *
+ * @experimental
+ */
+function flush(maxTurns) {
+    if (fakeAsyncTestModule) {
+        return fakeAsyncTestModule.flush(maxTurns);
+    }
+    else {
+        return flushFallback(maxTurns);
+    }
+}
+/**
+ * Discard all remaining periodic tasks.
+ *
+ * @experimental
+ */
+function discardPeriodicTasks() {
+    if (fakeAsyncTestModule) {
+        return fakeAsyncTestModule.discardPeriodicTasks();
+    }
+    else {
+        discardPeriodicTasksFallback();
+    }
+}
+/**
+ * Flush any pending microtasks.
+ *
+ * @experimental
+ */
+function flushMicrotasks() {
+    if (fakeAsyncTestModule) {
+        return fakeAsyncTestModule.flushMicrotasks();
+    }
+    else {
+        return flushMicrotasksFallback();
+    }
 }
 
 /**
@@ -527,7 +651,7 @@ function flushMicrotasks() {
 /**
  * Injectable completer that allows signaling completion of an asynchronous test. Used internally.
  */
-var AsyncTestCompleter = (function () {
+var AsyncTestCompleter = /** @class */ (function () {
     function AsyncTestCompleter() {
         var _this = this;
         this._promise = new Promise(function (res, rej) {
@@ -552,6 +676,715 @@ var AsyncTestCompleter = (function () {
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+var _nextReferenceId = 0;
+var MetadataOverrider = /** @class */ (function () {
+    function MetadataOverrider() {
+        this._references = new Map();
+    }
+    /**
+     * Creates a new instance for the given metadata class
+     * based on an old instance and overrides.
+     */
+    MetadataOverrider.prototype.overrideMetadata = function (metadataClass, oldMetadata, override) {
+        var props = {};
+        if (oldMetadata) {
+            _valueProps(oldMetadata).forEach(function (prop) { return props[prop] = oldMetadata[prop]; });
+        }
+        if (override.set) {
+            if (override.remove || override.add) {
+                throw new Error("Cannot set and add/remove " + _angular_core.ɵstringify(metadataClass) + " at the same time!");
+            }
+            setMetadata(props, override.set);
+        }
+        if (override.remove) {
+            removeMetadata(props, override.remove, this._references);
+        }
+        if (override.add) {
+            addMetadata(props, override.add);
+        }
+        return new metadataClass(props);
+    };
+    return MetadataOverrider;
+}());
+function removeMetadata(metadata, remove, references) {
+    var removeObjects = new Set();
+    var _loop_1 = function (prop) {
+        var removeValue = remove[prop];
+        if (removeValue instanceof Array) {
+            removeValue.forEach(function (value) { removeObjects.add(_propHashKey(prop, value, references)); });
+        }
+        else {
+            removeObjects.add(_propHashKey(prop, removeValue, references));
+        }
+    };
+    for (var prop in remove) {
+        _loop_1(prop);
+    }
+    var _loop_2 = function (prop) {
+        var propValue = metadata[prop];
+        if (propValue instanceof Array) {
+            metadata[prop] = propValue.filter(function (value) { return !removeObjects.has(_propHashKey(prop, value, references)); });
+        }
+        else {
+            if (removeObjects.has(_propHashKey(prop, propValue, references))) {
+                metadata[prop] = undefined;
+            }
+        }
+    };
+    for (var prop in metadata) {
+        _loop_2(prop);
+    }
+}
+function addMetadata(metadata, add) {
+    for (var prop in add) {
+        var addValue = add[prop];
+        var propValue = metadata[prop];
+        if (propValue != null && propValue instanceof Array) {
+            metadata[prop] = propValue.concat(addValue);
+        }
+        else {
+            metadata[prop] = addValue;
+        }
+    }
+}
+function setMetadata(metadata, set) {
+    for (var prop in set) {
+        metadata[prop] = set[prop];
+    }
+}
+function _propHashKey(propName, propValue, references) {
+    var replacer = function (key, value) {
+        if (typeof value === 'function') {
+            value = _serializeReference(value, references);
+        }
+        return value;
+    };
+    return propName + ":" + JSON.stringify(propValue, replacer);
+}
+function _serializeReference(ref, references) {
+    var id = references.get(ref);
+    if (!id) {
+        id = "" + _angular_core.ɵstringify(ref) + _nextReferenceId++;
+        references.set(ref, id);
+    }
+    return id;
+}
+function _valueProps(obj) {
+    var props = [];
+    // regular public props
+    Object.keys(obj).forEach(function (prop) {
+        if (!prop.startsWith('_')) {
+            props.push(prop);
+        }
+    });
+    // getters
+    var proto = obj;
+    while (proto = Object.getPrototypeOf(proto)) {
+        Object.keys(proto).forEach(function (protoProp) {
+            var desc = Object.getOwnPropertyDescriptor(proto, protoProp);
+            if (!protoProp.startsWith('_') && desc && 'get' in desc) {
+                props.push(protoProp);
+            }
+        });
+    }
+    return props;
+}
+
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+var reflection = new _angular_core.ɵReflectionCapabilities();
+/**
+ * Allows to override ivy metadata for tests (via the `TestBed`).
+ */
+var OverrideResolver = /** @class */ (function () {
+    function OverrideResolver() {
+        this.overrides = new Map();
+        this.resolved = new Map();
+    }
+    OverrideResolver.prototype.setOverrides = function (overrides) {
+        var _this = this;
+        this.overrides.clear();
+        overrides.forEach(function (_a) {
+            var type = _a[0], override = _a[1];
+            return _this.overrides.set(type, override);
+        });
+    };
+    OverrideResolver.prototype.getAnnotation = function (type) {
+        var _this = this;
+        return reflection.annotations(type).find(function (a) { return a instanceof _this.type; }) || null;
+    };
+    OverrideResolver.prototype.resolve = function (type) {
+        var resolved = this.resolved.get(type) || null;
+        if (!resolved) {
+            resolved = this.getAnnotation(type);
+            if (resolved) {
+                var override = this.overrides.get(type);
+                if (override) {
+                    var overrider = new MetadataOverrider();
+                    resolved = overrider.overrideMetadata(this.type, resolved, override);
+                }
+            }
+            this.resolved.set(type, resolved);
+        }
+        return resolved;
+    };
+    return OverrideResolver;
+}());
+var DirectiveResolver = /** @class */ (function (_super) {
+    __extends(DirectiveResolver, _super);
+    function DirectiveResolver() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(DirectiveResolver.prototype, "type", {
+        get: function () { return _angular_core.Directive; },
+        enumerable: true,
+        configurable: true
+    });
+    return DirectiveResolver;
+}(OverrideResolver));
+var ComponentResolver = /** @class */ (function (_super) {
+    __extends(ComponentResolver, _super);
+    function ComponentResolver() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(ComponentResolver.prototype, "type", {
+        get: function () { return _angular_core.Component; },
+        enumerable: true,
+        configurable: true
+    });
+    return ComponentResolver;
+}(OverrideResolver));
+var PipeResolver = /** @class */ (function (_super) {
+    __extends(PipeResolver, _super);
+    function PipeResolver() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(PipeResolver.prototype, "type", {
+        get: function () { return _angular_core.Pipe; },
+        enumerable: true,
+        configurable: true
+    });
+    return PipeResolver;
+}(OverrideResolver));
+var NgModuleResolver = /** @class */ (function (_super) {
+    __extends(NgModuleResolver, _super);
+    function NgModuleResolver() {
+        return _super !== null && _super.apply(this, arguments) || this;
+    }
+    Object.defineProperty(NgModuleResolver.prototype, "type", {
+        get: function () { return _angular_core.NgModule; },
+        enumerable: true,
+        configurable: true
+    });
+    return NgModuleResolver;
+}(OverrideResolver));
+
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+/**
+ * An abstract class for inserting the root test component element in a platform independent way.
+ *
+ * @experimental
+ */
+var TestComponentRenderer = /** @class */ (function () {
+    function TestComponentRenderer() {
+    }
+    TestComponentRenderer.prototype.insertRootElement = function (rootElementId) { };
+    return TestComponentRenderer;
+}());
+/**
+ * @experimental
+ */
+var ComponentFixtureAutoDetect = new _angular_core.InjectionToken('ComponentFixtureAutoDetect');
+/**
+ * @experimental
+ */
+var ComponentFixtureNoNgZone = new _angular_core.InjectionToken('ComponentFixtureNoNgZone');
+
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+var _nextRootElementId$1 = 0;
+/**
+ * @description
+ * Configures and initializes environment for unit testing and provides methods for
+ * creating components and services in unit tests.
+ *
+ * TestBed is the primary api for writing unit tests for Angular applications and libraries.
+ *
+ * Note: Use `TestBed` in tests. It will be set to either `TestBedViewEngine` or `TestBedRender3`
+ * according to the compiler used.
+ */
+var TestBedRender3 = /** @class */ (function () {
+    function TestBedRender3() {
+        // Properties
+        this.platform = null;
+        this.ngModule = null;
+        // metadata overrides
+        this._moduleOverrides = [];
+        this._componentOverrides = [];
+        this._directiveOverrides = [];
+        this._pipeOverrides = [];
+        this._providerOverrides = [];
+        this._rootProviderOverrides = [];
+        // test module configuration
+        this._providers = [];
+        this._declarations = [];
+        this._imports = [];
+        this._schemas = [];
+        this._activeFixtures = [];
+        this._moduleRef = null;
+        this._instantiated = false;
+    }
+    /**
+     * Initialize the environment for testing with a compiler factory, a PlatformRef, and an
+     * angular module. These are common to every test in the suite.
+     *
+     * This may only be called once, to set up the common providers for the current test
+     * suite on the current platform. If you absolutely need to change the providers,
+     * first use `resetTestEnvironment`.
+     *
+     * Test modules and platforms for individual platforms are available from
+     * '@angular/<platform_name>/testing'.
+     *
+     * @experimental
+     */
+    TestBedRender3.initTestEnvironment = function (ngModule, platform, aotSummaries) {
+        var testBed = _getTestBedRender3();
+        testBed.initTestEnvironment(ngModule, platform, aotSummaries);
+        return testBed;
+    };
+    /**
+     * Reset the providers for the test injector.
+     *
+     * @experimental
+     */
+    TestBedRender3.resetTestEnvironment = function () { _getTestBedRender3().resetTestEnvironment(); };
+    TestBedRender3.configureCompiler = function (config) {
+        _getTestBedRender3().configureCompiler(config);
+        return TestBedRender3;
+    };
+    /**
+     * Allows overriding default providers, directives, pipes, modules of the test injector,
+     * which are defined in test_injector.js
+     */
+    TestBedRender3.configureTestingModule = function (moduleDef) {
+        _getTestBedRender3().configureTestingModule(moduleDef);
+        return TestBedRender3;
+    };
+    /**
+     * Compile components with a `templateUrl` for the test's NgModule.
+     * It is necessary to call this function
+     * as fetching urls is asynchronous.
+     */
+    TestBedRender3.compileComponents = function () { return _getTestBedRender3().compileComponents(); };
+    TestBedRender3.overrideModule = function (ngModule, override) {
+        _getTestBedRender3().overrideModule(ngModule, override);
+        return TestBedRender3;
+    };
+    TestBedRender3.overrideComponent = function (component, override) {
+        _getTestBedRender3().overrideComponent(component, override);
+        return TestBedRender3;
+    };
+    TestBedRender3.overrideDirective = function (directive, override) {
+        _getTestBedRender3().overrideDirective(directive, override);
+        return TestBedRender3;
+    };
+    TestBedRender3.overridePipe = function (pipe, override) {
+        _getTestBedRender3().overridePipe(pipe, override);
+        return TestBedRender3;
+    };
+    TestBedRender3.overrideTemplate = function (component, template) {
+        _getTestBedRender3().overrideComponent(component, { set: { template: template, templateUrl: null } });
+        return TestBedRender3;
+    };
+    /**
+     * Overrides the template of the given component, compiling the template
+     * in the context of the TestingModule.
+     *
+     * Note: This works for JIT and AOTed components as well.
+     */
+    TestBedRender3.overrideTemplateUsingTestingModule = function (component, template) {
+        _getTestBedRender3().overrideTemplateUsingTestingModule(component, template);
+        return TestBedRender3;
+    };
+    TestBedRender3.prototype.overrideTemplateUsingTestingModule = function (component, template) {
+        throw new Error('Render3TestBed.overrideTemplateUsingTestingModule is not implemented yet');
+    };
+    TestBedRender3.overrideProvider = function (token, provider) {
+        _getTestBedRender3().overrideProvider(token, provider);
+        return TestBedRender3;
+    };
+    TestBedRender3.deprecatedOverrideProvider = function (token, provider) {
+        throw new Error('Render3TestBed.deprecatedOverrideProvider is not implemented');
+    };
+    TestBedRender3.get = function (token, notFoundValue) {
+        if (notFoundValue === void 0) { notFoundValue = _angular_core.Injector.THROW_IF_NOT_FOUND; }
+        return _getTestBedRender3().get(token, notFoundValue);
+    };
+    TestBedRender3.createComponent = function (component) {
+        return _getTestBedRender3().createComponent(component);
+    };
+    TestBedRender3.resetTestingModule = function () {
+        _getTestBedRender3().resetTestingModule();
+        return TestBedRender3;
+    };
+    /**
+     * Initialize the environment for testing with a compiler factory, a PlatformRef, and an
+     * angular module. These are common to every test in the suite.
+     *
+     * This may only be called once, to set up the common providers for the current test
+     * suite on the current platform. If you absolutely need to change the providers,
+     * first use `resetTestEnvironment`.
+     *
+     * Test modules and platforms for individual platforms are available from
+     * '@angular/<platform_name>/testing'.
+     *
+     * @experimental
+     */
+    TestBedRender3.prototype.initTestEnvironment = function (ngModule, platform, aotSummaries) {
+        if (this.platform || this.ngModule) {
+            throw new Error('Cannot set base providers because it has already been called');
+        }
+        this.platform = platform;
+        this.ngModule = ngModule;
+    };
+    /**
+     * Reset the providers for the test injector.
+     *
+     * @experimental
+     */
+    TestBedRender3.prototype.resetTestEnvironment = function () {
+        this.resetTestingModule();
+        this.platform = null;
+        this.ngModule = null;
+    };
+    TestBedRender3.prototype.resetTestingModule = function () {
+        // reset metadata overrides
+        this._moduleOverrides = [];
+        this._componentOverrides = [];
+        this._directiveOverrides = [];
+        this._pipeOverrides = [];
+        this._providerOverrides = [];
+        this._rootProviderOverrides = [];
+        // reset test module config
+        this._providers = [];
+        this._declarations = [];
+        this._imports = [];
+        this._schemas = [];
+        this._moduleRef = null;
+        this._instantiated = false;
+        this._activeFixtures.forEach(function (fixture) {
+            try {
+                fixture.destroy();
+            }
+            catch (e) {
+                console.error('Error during cleanup of component', {
+                    component: fixture.componentInstance,
+                    stacktrace: e,
+                });
+            }
+        });
+        this._activeFixtures = [];
+    };
+    TestBedRender3.prototype.configureCompiler = function (config) {
+        throw new Error('the Render3 compiler is not configurable !');
+    };
+    TestBedRender3.prototype.configureTestingModule = function (moduleDef) {
+        var _a, _b, _c, _d;
+        this._assertNotInstantiated('R3TestBed.configureTestingModule', 'configure the test module');
+        if (moduleDef.providers) {
+            (_a = this._providers).push.apply(_a, moduleDef.providers);
+        }
+        if (moduleDef.declarations) {
+            (_b = this._declarations).push.apply(_b, moduleDef.declarations);
+        }
+        if (moduleDef.imports) {
+            (_c = this._imports).push.apply(_c, moduleDef.imports);
+        }
+        if (moduleDef.schemas) {
+            (_d = this._schemas).push.apply(_d, moduleDef.schemas);
+        }
+    };
+    // TODO(vicb): implement
+    TestBedRender3.prototype.compileComponents = function () {
+        throw new Error('Render3TestBed.compileComponents is not implemented yet');
+    };
+    TestBedRender3.prototype.get = function (token, notFoundValue) {
+        if (notFoundValue === void 0) { notFoundValue = _angular_core.Injector.THROW_IF_NOT_FOUND; }
+        this._initIfNeeded();
+        if (token === TestBedRender3) {
+            return this;
+        }
+        return this._moduleRef.injector.get(token, notFoundValue);
+    };
+    TestBedRender3.prototype.execute = function (tokens, fn, context) {
+        var _this = this;
+        this._initIfNeeded();
+        var params = tokens.map(function (t) { return _this.get(t); });
+        return fn.apply(context, params);
+    };
+    TestBedRender3.prototype.overrideModule = function (ngModule, override) {
+        this._assertNotInstantiated('overrideModule', 'override module metadata');
+        this._moduleOverrides.push([ngModule, override]);
+    };
+    TestBedRender3.prototype.overrideComponent = function (component, override) {
+        this._assertNotInstantiated('overrideComponent', 'override component metadata');
+        this._componentOverrides.push([component, override]);
+    };
+    TestBedRender3.prototype.overrideDirective = function (directive, override) {
+        this._assertNotInstantiated('overrideDirective', 'override directive metadata');
+        this._directiveOverrides.push([directive, override]);
+    };
+    TestBedRender3.prototype.overridePipe = function (pipe, override) {
+        this._assertNotInstantiated('overridePipe', 'override pipe metadata');
+        this._pipeOverrides.push([pipe, override]);
+    };
+    /**
+     * Overwrites all providers for the given token with the given provider definition.
+     */
+    TestBedRender3.prototype.overrideProvider = function (token, provider) {
+        var isRoot = (typeof token !== 'string' && token.ngInjectableDef &&
+            token.ngInjectableDef.providedIn === 'root');
+        var overrides = isRoot ? this._rootProviderOverrides : this._providerOverrides;
+        if (provider.useFactory) {
+            overrides.push({ provide: token, useFactory: provider.useFactory, deps: provider.deps || [] });
+        }
+        else {
+            overrides.push({ provide: token, useValue: provider.useValue });
+        }
+    };
+    TestBedRender3.prototype.deprecatedOverrideProvider = function (token, provider) {
+        throw new Error('No implemented in IVY');
+    };
+    TestBedRender3.prototype.createComponent = function (type) {
+        this._initIfNeeded();
+        var testComponentRenderer = this.get(TestComponentRenderer);
+        var rootElId = "root" + _nextRootElementId$1++;
+        testComponentRenderer.insertRootElement(rootElId);
+        var componentDef = type.ngComponentDef;
+        if (!componentDef) {
+            throw new Error("It looks like '" + _angular_core.ɵstringify(type) + "' has not been IVY compiled - it has no 'ngComponentDef' field");
+        }
+        var componentFactory = new _angular_core.ɵRender3ComponentFactory(componentDef);
+        var componentRef = componentFactory.create(_angular_core.Injector.NULL, [], "#" + rootElId, this._moduleRef);
+        var autoDetect = this.get(ComponentFixtureAutoDetect, false);
+        var fixture = new ComponentFixture(componentRef, null, autoDetect);
+        this._activeFixtures.push(fixture);
+        return fixture;
+    };
+    // internal methods
+    TestBedRender3.prototype._initIfNeeded = function () {
+        if (this._instantiated) {
+            return;
+        }
+        var resolvers = this._getResolvers();
+        var testModuleType = this._createTestModule();
+        compileNgModule(testModuleType, resolvers);
+        var parentInjector = this.platform.injector;
+        this._moduleRef = new _angular_core.ɵRender3NgModuleRef(testModuleType, parentInjector);
+        this._instantiated = true;
+    };
+    // creates resolvers taking overrides into account
+    TestBedRender3.prototype._getResolvers = function () {
+        var module = new NgModuleResolver();
+        module.setOverrides(this._moduleOverrides);
+        var component = new ComponentResolver();
+        component.setOverrides(this._componentOverrides);
+        var directive = new DirectiveResolver();
+        directive.setOverrides(this._directiveOverrides);
+        var pipe = new PipeResolver();
+        pipe.setOverrides(this._pipeOverrides);
+        return { module: module, component: component, directive: directive, pipe: pipe };
+    };
+    TestBedRender3.prototype._assertNotInstantiated = function (methodName, methodDescription) {
+        if (this._instantiated) {
+            throw new Error("Cannot " + methodDescription + " when the test module has already been instantiated. " +
+                ("Make sure you are not using `inject` before `" + methodName + "`."));
+        }
+    };
+    TestBedRender3.prototype._createTestModule = function () {
+        var rootProviderOverrides = this._rootProviderOverrides;
+        var rendererFactoryWrapper = {
+            provide: _angular_core.ɵWRAP_RENDERER_FACTORY2,
+            useFactory: function () { return function (rf) { return new _angular_core.ɵRender3DebugRendererFactory2(rf); }; },
+        };
+        var RootScopeModule = /** @class */ (function () {
+            function RootScopeModule() {
+            }
+            RootScopeModule = __decorate([
+                _angular_core.NgModule({
+                    providers: rootProviderOverrides.concat([rendererFactoryWrapper]),
+                    jit: true,
+                })
+            ], RootScopeModule);
+            return RootScopeModule;
+        }());
+        var providers = this._providers.concat(this._providerOverrides);
+        var declarations = this._declarations;
+        var imports = [RootScopeModule, this.ngModule, this._imports];
+        var schemas = this._schemas;
+        var DynamicTestModule = /** @class */ (function () {
+            function DynamicTestModule() {
+            }
+            DynamicTestModule = __decorate([
+                _angular_core.NgModule({ providers: providers, declarations: declarations, imports: imports, schemas: schemas, jit: true })
+            ], DynamicTestModule);
+            return DynamicTestModule;
+        }());
+        return DynamicTestModule;
+    };
+    return TestBedRender3;
+}());
+var testBed$1;
+function _getTestBedRender3() {
+    return testBed$1 = testBed$1 || new TestBedRender3();
+}
+// Module compiler
+var EMPTY_ARRAY = [];
+function compileNgModule(moduleType, resolvers) {
+    var ngModule = resolvers.module.resolve(moduleType);
+    if (ngModule === null) {
+        throw new Error(_angular_core.ɵstringify(moduleType) + " has not @NgModule annotation");
+    }
+    _angular_core.ɵcompileNgModuleDefs(moduleType, ngModule);
+    var declarations = flatten(ngModule.declarations || EMPTY_ARRAY);
+    var compiledComponents = [];
+    // Compile the components, directives and pipes declared by this module
+    declarations.forEach(function (declaration) {
+        var component = resolvers.component.resolve(declaration);
+        if (component) {
+            _angular_core.ɵcompileComponent(declaration, component);
+            compiledComponents.push(declaration);
+            return;
+        }
+        var directive = resolvers.directive.resolve(declaration);
+        if (directive) {
+            _angular_core.ɵcompileDirective(declaration, directive);
+            return;
+        }
+        var pipe = resolvers.pipe.resolve(declaration);
+        if (pipe) {
+            _angular_core.ɵcompilePipe(declaration, pipe);
+            return;
+        }
+    });
+    // Compile transitive modules, components, directives and pipes
+    var transitiveScope = transitiveScopesFor(moduleType, resolvers);
+    compiledComponents.forEach(function (cmp) { return _angular_core.ɵpatchComponentDefWithScope(cmp.ngComponentDef, transitiveScope); });
+}
+/**
+ * Compute the pair of transitive scopes (compilation scope and exported scope) for a given module.
+ *
+ * This operation is memoized and the result is cached on the module's definition. It can be called
+ * on modules with components that have not fully compiled yet, but the result should not be used
+ * until they have.
+ */
+function transitiveScopesFor(moduleType, resolvers) {
+    if (!isNgModule(moduleType)) {
+        throw new Error(moduleType.name + " does not have an ngModuleDef");
+    }
+    var def = moduleType.ngModuleDef;
+    if (def.transitiveCompileScopes !== null) {
+        return def.transitiveCompileScopes;
+    }
+    var scopes = {
+        compilation: {
+            directives: new Set(),
+            pipes: new Set(),
+        },
+        exported: {
+            directives: new Set(),
+            pipes: new Set(),
+        },
+    };
+    def.declarations.forEach(function (declared) {
+        var declaredWithDefs = declared;
+        if (declaredWithDefs.ngPipeDef !== undefined) {
+            scopes.compilation.pipes.add(declared);
+        }
+        else {
+            scopes.compilation.directives.add(declared);
+        }
+    });
+    def.imports.forEach(function (imported) {
+        var ngModule = resolvers.module.resolve(imported);
+        if (ngModule === null) {
+            throw new Error("Importing " + imported.name + " which does not have an @ngModule");
+        }
+        else {
+            compileNgModule(imported, resolvers);
+        }
+        // When this module imports another, the imported module's exported directives and pipes are
+        // added to the compilation scope of this module.
+        var importedScope = transitiveScopesFor(imported, resolvers);
+        importedScope.exported.directives.forEach(function (entry) { return scopes.compilation.directives.add(entry); });
+        importedScope.exported.pipes.forEach(function (entry) { return scopes.compilation.pipes.add(entry); });
+    });
+    def.exports.forEach(function (exported) {
+        var exportedTyped = exported;
+        // Either the type is a module, a pipe, or a component/directive (which may not have an
+        // ngComponentDef as it might be compiled asynchronously).
+        if (isNgModule(exportedTyped)) {
+            // When this module exports another, the exported module's exported directives and pipes are
+            // added to both the compilation and exported scopes of this module.
+            var exportedScope = transitiveScopesFor(exportedTyped, resolvers);
+            exportedScope.exported.directives.forEach(function (entry) {
+                scopes.compilation.directives.add(entry);
+                scopes.exported.directives.add(entry);
+            });
+            exportedScope.exported.pipes.forEach(function (entry) {
+                scopes.compilation.pipes.add(entry);
+                scopes.exported.pipes.add(entry);
+            });
+        }
+        else if (exportedTyped.ngPipeDef !== undefined) {
+            scopes.exported.pipes.add(exportedTyped);
+        }
+        else {
+            scopes.exported.directives.add(exportedTyped);
+        }
+    });
+    def.transitiveCompileScopes = scopes;
+    return scopes;
+}
+function flatten(values) {
+    var out = [];
+    values.forEach(function (value) {
+        if (Array.isArray(value)) {
+            out.push.apply(out, flatten(value));
+        }
+        else {
+            out.push(value);
+        }
+    });
+    return out;
+}
+function isNgModule(value) {
+    return value.ngModuleDef !== undefined;
+}
+
+/**
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
 function unimplemented() {
     throw Error('unimplemented');
 }
@@ -560,7 +1393,7 @@ function unimplemented() {
  *
  * @experimental
  */
-var TestingCompiler = (function (_super) {
+var TestingCompiler = /** @class */ (function (_super) {
     __extends(TestingCompiler, _super);
     function TestingCompiler() {
         return _super !== null && _super.apply(this, arguments) || this;
@@ -586,44 +1419,21 @@ var TestingCompiler = (function (_super) {
      * Allows to pass the compile summary from AOT compilation to the JIT compiler,
      * so that it can use the code generated by AOT.
      */
-    /**
-       * Allows to pass the compile summary from AOT compilation to the JIT compiler,
-       * so that it can use the code generated by AOT.
-       */
-    TestingCompiler.prototype.loadAotSummaries = /**
-       * Allows to pass the compile summary from AOT compilation to the JIT compiler,
-       * so that it can use the code generated by AOT.
-       */
-    function (summaries) { throw unimplemented(); };
+    TestingCompiler.prototype.loadAotSummaries = function (summaries) { throw unimplemented(); };
     /**
      * Gets the component factory for the given component.
      * This assumes that the component has been compiled before calling this call using
      * `compileModuleAndAllComponents*`.
      */
-    /**
-       * Gets the component factory for the given component.
-       * This assumes that the component has been compiled before calling this call using
-       * `compileModuleAndAllComponents*`.
-       */
-    TestingCompiler.prototype.getComponentFactory = /**
-       * Gets the component factory for the given component.
-       * This assumes that the component has been compiled before calling this call using
-       * `compileModuleAndAllComponents*`.
-       */
-    function (component) { throw unimplemented(); };
+    TestingCompiler.prototype.getComponentFactory = function (component) { throw unimplemented(); };
     /**
      * Returns the component type that is stored in the given error.
      * This can be used for errors created by compileModule...
      */
-    /**
-       * Returns the component type that is stored in the given error.
-       * This can be used for errors created by compileModule...
-       */
-    TestingCompiler.prototype.getComponentFromError = /**
-       * Returns the component type that is stored in the given error.
-       * This can be used for errors created by compileModule...
-       */
-    function (error) { throw unimplemented(); };
+    TestingCompiler.prototype.getComponentFromError = function (error) { throw unimplemented(); };
+    TestingCompiler = __decorate([
+        _angular_core.Injectable()
+    ], TestingCompiler);
     return TestingCompiler;
 }(_angular_core.Compiler));
 /**
@@ -631,7 +1441,7 @@ var TestingCompiler = (function (_super) {
  *
  * @experimental
  */
-var TestingCompilerFactory = (function () {
+var TestingCompilerFactory = /** @class */ (function () {
     function TestingCompilerFactory() {
     }
     return TestingCompilerFactory;
@@ -645,37 +1455,19 @@ var TestingCompilerFactory = (function () {
  * found in the LICENSE file at https://angular.io/license
  */
 var UNDEFINED = new Object();
-/**
- * An abstract class for inserting the root test component element in a platform independent way.
- *
- * @experimental
- */
-var TestComponentRenderer = (function () {
-    function TestComponentRenderer() {
-    }
-    TestComponentRenderer.prototype.insertRootElement = function (rootElementId) { };
-    return TestComponentRenderer;
-}());
 var _nextRootElementId = 0;
 /**
- * @experimental
- */
-var ComponentFixtureAutoDetect = new _angular_core.InjectionToken('ComponentFixtureAutoDetect');
-/**
- * @experimental
- */
-var ComponentFixtureNoNgZone = new _angular_core.InjectionToken('ComponentFixtureNoNgZone');
-/**
- * @whatItDoes Configures and initializes environment for unit testing and provides methods for
- * creating components and services in unit tests.
  * @description
+ * Configures and initializes environment for unit testing and provides methods for
+ * creating components and services in unit tests.
  *
- * TestBed is the primary api for writing unit tests for Angular applications and libraries.
+ * `TestBed` is the primary api for writing unit tests for Angular applications and libraries.
  *
- * @stable
+ * Note: Use `TestBed` in tests. It will be set to either `TestBedViewEngine` or `TestBedRender3`
+ * according to the compiler used.
  */
-var TestBed = (function () {
-    function TestBed() {
+var TestBedViewEngine = /** @class */ (function () {
+    function TestBedViewEngine() {
         this._instantiated = false;
         this._compiler = null;
         this._moduleRef = null;
@@ -690,7 +1482,11 @@ var TestBed = (function () {
         this._imports = [];
         this._schemas = [];
         this._activeFixtures = [];
-        this._aotSummaries = function () { return []; };
+        this._testEnvAotSummaries = function () { return []; };
+        this._aotSummaries = [];
+        this._templateOverrides = [];
+        this._isRoot = true;
+        this._rootProviderOverrides = [];
         this.platform = null;
         this.ngModule = null;
     }
@@ -707,34 +1503,8 @@ var TestBed = (function () {
      *
      * @experimental
      */
-    /**
-       * Initialize the environment for testing with a compiler factory, a PlatformRef, and an
-       * angular module. These are common to every test in the suite.
-       *
-       * This may only be called once, to set up the common providers for the current test
-       * suite on the current platform. If you absolutely need to change the providers,
-       * first use `resetTestEnvironment`.
-       *
-       * Test modules and platforms for individual platforms are available from
-       * '@angular/<platform_name>/testing'.
-       *
-       * @experimental
-       */
-    TestBed.initTestEnvironment = /**
-       * Initialize the environment for testing with a compiler factory, a PlatformRef, and an
-       * angular module. These are common to every test in the suite.
-       *
-       * This may only be called once, to set up the common providers for the current test
-       * suite on the current platform. If you absolutely need to change the providers,
-       * first use `resetTestEnvironment`.
-       *
-       * Test modules and platforms for individual platforms are available from
-       * '@angular/<platform_name>/testing'.
-       *
-       * @experimental
-       */
-    function (ngModule, platform, aotSummaries) {
-        var testBed = getTestBed();
+    TestBedViewEngine.initTestEnvironment = function (ngModule, platform, aotSummaries) {
+        var testBed = _getTestBedViewEngine();
         testBed.initTestEnvironment(ngModule, platform, aotSummaries);
         return testBed;
     };
@@ -743,103 +1513,77 @@ var TestBed = (function () {
      *
      * @experimental
      */
-    /**
-       * Reset the providers for the test injector.
-       *
-       * @experimental
-       */
-    TestBed.resetTestEnvironment = /**
-       * Reset the providers for the test injector.
-       *
-       * @experimental
-       */
-    function () { getTestBed().resetTestEnvironment(); };
-    TestBed.resetTestingModule = function () {
-        getTestBed().resetTestingModule();
-        return TestBed;
+    TestBedViewEngine.resetTestEnvironment = function () { _getTestBedViewEngine().resetTestEnvironment(); };
+    TestBedViewEngine.resetTestingModule = function () {
+        _getTestBedViewEngine().resetTestingModule();
+        return TestBedViewEngine;
     };
     /**
      * Allows overriding default compiler providers and settings
      * which are defined in test_injector.js
      */
-    /**
-       * Allows overriding default compiler providers and settings
-       * which are defined in test_injector.js
-       */
-    TestBed.configureCompiler = /**
-       * Allows overriding default compiler providers and settings
-       * which are defined in test_injector.js
-       */
-    function (config) {
-        getTestBed().configureCompiler(config);
-        return TestBed;
+    TestBedViewEngine.configureCompiler = function (config) {
+        _getTestBedViewEngine().configureCompiler(config);
+        return TestBedViewEngine;
     };
     /**
      * Allows overriding default providers, directives, pipes, modules of the test injector,
      * which are defined in test_injector.js
      */
-    /**
-       * Allows overriding default providers, directives, pipes, modules of the test injector,
-       * which are defined in test_injector.js
-       */
-    TestBed.configureTestingModule = /**
-       * Allows overriding default providers, directives, pipes, modules of the test injector,
-       * which are defined in test_injector.js
-       */
-    function (moduleDef) {
-        getTestBed().configureTestingModule(moduleDef);
-        return TestBed;
+    TestBedViewEngine.configureTestingModule = function (moduleDef) {
+        _getTestBedViewEngine().configureTestingModule(moduleDef);
+        return TestBedViewEngine;
     };
     /**
      * Compile components with a `templateUrl` for the test's NgModule.
      * It is necessary to call this function
      * as fetching urls is asynchronous.
      */
+    TestBedViewEngine.compileComponents = function () { return getTestBed().compileComponents(); };
+    TestBedViewEngine.overrideModule = function (ngModule, override) {
+        _getTestBedViewEngine().overrideModule(ngModule, override);
+        return TestBedViewEngine;
+    };
+    TestBedViewEngine.overrideComponent = function (component, override) {
+        _getTestBedViewEngine().overrideComponent(component, override);
+        return TestBedViewEngine;
+    };
+    TestBedViewEngine.overrideDirective = function (directive, override) {
+        _getTestBedViewEngine().overrideDirective(directive, override);
+        return TestBedViewEngine;
+    };
+    TestBedViewEngine.overridePipe = function (pipe, override) {
+        _getTestBedViewEngine().overridePipe(pipe, override);
+        return TestBedViewEngine;
+    };
+    TestBedViewEngine.overrideTemplate = function (component, template) {
+        _getTestBedViewEngine().overrideComponent(component, { set: { template: template, templateUrl: null } });
+        return TestBedViewEngine;
+    };
     /**
-       * Compile components with a `templateUrl` for the test's NgModule.
-       * It is necessary to call this function
-       * as fetching urls is asynchronous.
-       */
-    TestBed.compileComponents = /**
-       * Compile components with a `templateUrl` for the test's NgModule.
-       * It is necessary to call this function
-       * as fetching urls is asynchronous.
-       */
-    function () { return getTestBed().compileComponents(); };
-    TestBed.overrideModule = function (ngModule, override) {
-        getTestBed().overrideModule(ngModule, override);
-        return TestBed;
+     * Overrides the template of the given component, compiling the template
+     * in the context of the TestingModule.
+     *
+     * Note: This works for JIT and AOTed components as well.
+     */
+    TestBedViewEngine.overrideTemplateUsingTestingModule = function (component, template) {
+        _getTestBedViewEngine().overrideTemplateUsingTestingModule(component, template);
+        return TestBedViewEngine;
     };
-    TestBed.overrideComponent = function (component, override) {
-        getTestBed().overrideComponent(component, override);
-        return TestBed;
+    TestBedViewEngine.overrideProvider = function (token, provider) {
+        _getTestBedViewEngine().overrideProvider(token, provider);
+        return TestBedViewEngine;
     };
-    TestBed.overrideDirective = function (directive, override) {
-        getTestBed().overrideDirective(directive, override);
-        return TestBed;
+    TestBedViewEngine.deprecatedOverrideProvider = function (token, provider) {
+        _getTestBedViewEngine().deprecatedOverrideProvider(token, provider);
+        return TestBedViewEngine;
     };
-    TestBed.overridePipe = function (pipe, override) {
-        getTestBed().overridePipe(pipe, override);
-        return TestBed;
-    };
-    TestBed.overrideTemplate = function (component, template) {
-        getTestBed().overrideComponent(component, { set: { template: template, templateUrl: (null) } });
-        return TestBed;
-    };
-    TestBed.overrideProvider = function (token, provider) {
-        getTestBed().overrideProvider(token, provider);
-        return TestBed;
-    };
-    TestBed.deprecatedOverrideProvider = function (token, provider) {
-        getTestBed().deprecatedOverrideProvider(token, provider);
-        return TestBed;
-    };
-    TestBed.get = function (token, notFoundValue) {
+    TestBedViewEngine.get = function (token, notFoundValue) {
         if (notFoundValue === void 0) { notFoundValue = _angular_core.Injector.THROW_IF_NOT_FOUND; }
-        return getTestBed().get(token, notFoundValue);
+        return _getTestBedViewEngine().get(token, notFoundValue);
     };
-    TestBed.createComponent = function (component) {
-        return getTestBed().createComponent(component);
+    TestBedViewEngine.createComponent = function (component) {
+        return _getTestBedViewEngine().createComponent(component);
     };
     /**
      * Initialize the environment for testing with a compiler factory, a PlatformRef, and an
@@ -854,40 +1598,14 @@ var TestBed = (function () {
      *
      * @experimental
      */
-    /**
-       * Initialize the environment for testing with a compiler factory, a PlatformRef, and an
-       * angular module. These are common to every test in the suite.
-       *
-       * This may only be called once, to set up the common providers for the current test
-       * suite on the current platform. If you absolutely need to change the providers,
-       * first use `resetTestEnvironment`.
-       *
-       * Test modules and platforms for individual platforms are available from
-       * '@angular/<platform_name>/testing'.
-       *
-       * @experimental
-       */
-    TestBed.prototype.initTestEnvironment = /**
-       * Initialize the environment for testing with a compiler factory, a PlatformRef, and an
-       * angular module. These are common to every test in the suite.
-       *
-       * This may only be called once, to set up the common providers for the current test
-       * suite on the current platform. If you absolutely need to change the providers,
-       * first use `resetTestEnvironment`.
-       *
-       * Test modules and platforms for individual platforms are available from
-       * '@angular/<platform_name>/testing'.
-       *
-       * @experimental
-       */
-    function (ngModule, platform, aotSummaries) {
+    TestBedViewEngine.prototype.initTestEnvironment = function (ngModule, platform, aotSummaries) {
         if (this.platform || this.ngModule) {
             throw new Error('Cannot set base providers because it has already been called');
         }
         this.platform = platform;
         this.ngModule = ngModule;
         if (aotSummaries) {
-            this._aotSummaries = aotSummaries;
+            this._testEnvAotSummaries = aotSummaries;
         }
     };
     /**
@@ -895,31 +1613,25 @@ var TestBed = (function () {
      *
      * @experimental
      */
-    /**
-       * Reset the providers for the test injector.
-       *
-       * @experimental
-       */
-    TestBed.prototype.resetTestEnvironment = /**
-       * Reset the providers for the test injector.
-       *
-       * @experimental
-       */
-    function () {
+    TestBedViewEngine.prototype.resetTestEnvironment = function () {
         this.resetTestingModule();
-        this.platform = (null);
-        this.ngModule = (null);
-        this._aotSummaries = function () { return []; };
+        this.platform = null;
+        this.ngModule = null;
+        this._testEnvAotSummaries = function () { return []; };
     };
-    TestBed.prototype.resetTestingModule = function () {
-        _angular_core.ɵclearProviderOverrides();
-        this._compiler = (null);
+    TestBedViewEngine.prototype.resetTestingModule = function () {
+        _angular_core.ɵclearOverrides();
+        this._aotSummaries = [];
+        this._templateOverrides = [];
+        this._compiler = null;
         this._moduleOverrides = [];
         this._componentOverrides = [];
         this._directiveOverrides = [];
         this._pipeOverrides = [];
-        this._moduleRef = (null);
-        this._moduleFactory = (null);
+        this._isRoot = true;
+        this._rootProviderOverrides = [];
+        this._moduleRef = null;
+        this._moduleFactory = null;
         this._compilerOptions = [];
         this._providers = [];
         this._declarations = [];
@@ -931,16 +1643,20 @@ var TestBed = (function () {
                 fixture.destroy();
             }
             catch (e) {
-                console.error('Error during cleanup of component', fixture.componentInstance);
+                console.error('Error during cleanup of component', {
+                    component: fixture.componentInstance,
+                    stacktrace: e,
+                });
             }
         });
         this._activeFixtures = [];
     };
-    TestBed.prototype.configureCompiler = function (config) {
+    TestBedViewEngine.prototype.configureCompiler = function (config) {
         this._assertNotInstantiated('TestBed.configureCompiler', 'configure the compiler');
         this._compilerOptions.push(config);
     };
-    TestBed.prototype.configureTestingModule = function (moduleDef) {
+    TestBedViewEngine.prototype.configureTestingModule = function (moduleDef) {
+        var _a, _b, _c, _d;
         this._assertNotInstantiated('TestBed.configureTestingModule', 'configure the test module');
         if (moduleDef.providers) {
             (_a = this._providers).push.apply(_a, moduleDef.providers);
@@ -954,9 +1670,11 @@ var TestBed = (function () {
         if (moduleDef.schemas) {
             (_d = this._schemas).push.apply(_d, moduleDef.schemas);
         }
-        var _a, _b, _c, _d;
+        if (moduleDef.aotSummaries) {
+            this._aotSummaries.push(moduleDef.aotSummaries);
+        }
     };
-    TestBed.prototype.compileComponents = function () {
+    TestBedViewEngine.prototype.compileComponents = function () {
         var _this = this;
         if (this._moduleFactory || this._instantiated) {
             return Promise.resolve(null);
@@ -967,7 +1685,7 @@ var TestBed = (function () {
             _this._moduleFactory = moduleAndComponentFactories.ngModuleFactory;
         });
     };
-    TestBed.prototype._initIfNeeded = function () {
+    TestBedViewEngine.prototype._initIfNeeded = function () {
         if (this._instantiated) {
             return;
         }
@@ -988,48 +1706,74 @@ var TestBed = (function () {
                 }
             }
         }
+        for (var _i = 0, _a = this._templateOverrides; _i < _a.length; _i++) {
+            var _b = _a[_i], component = _b.component, templateOf = _b.templateOf;
+            var compFactory = this._compiler.getComponentFactory(templateOf);
+            _angular_core.ɵoverrideComponentView(component, compFactory);
+        }
         var ngZone = new _angular_core.NgZone({ enableLongStackTrace: true });
-        var ngZoneInjector = _angular_core.Injector.create([{ provide: _angular_core.NgZone, useValue: ngZone }], this.platform.injector);
+        var providers = [{ provide: _angular_core.NgZone, useValue: ngZone }];
+        var ngZoneInjector = _angular_core.Injector.create({
+            providers: providers,
+            parent: this.platform.injector,
+            name: this._moduleFactory.moduleType.name
+        });
         this._moduleRef = this._moduleFactory.create(ngZoneInjector);
-        // ApplicationInitStatus.runInitializers() is marked @internal to core. So casting to any
-        // before accessing it.
         // ApplicationInitStatus.runInitializers() is marked @internal to core. So casting to any
         // before accessing it.
         this._moduleRef.injector.get(_angular_core.ApplicationInitStatus).runInitializers();
         this._instantiated = true;
     };
-    TestBed.prototype._createCompilerAndModule = function () {
+    TestBedViewEngine.prototype._createCompilerAndModule = function () {
         var _this = this;
         var providers = this._providers.concat([{ provide: TestBed, useValue: this }]);
-        var declarations = this._declarations;
-        var imports = [this.ngModule, this._imports];
+        var declarations = this._declarations.concat(this._templateOverrides.map(function (entry) { return entry.templateOf; }));
+        var rootScopeImports = [];
+        var rootProviderOverrides = this._rootProviderOverrides;
+        if (this._isRoot) {
+            var RootScopeModule = /** @class */ (function () {
+                function RootScopeModule() {
+                }
+                RootScopeModule = __decorate([
+                    _angular_core.NgModule({
+                        providers: rootProviderOverrides.slice(),
+                        jit: true,
+                    })
+                ], RootScopeModule);
+                return RootScopeModule;
+            }());
+            rootScopeImports.push(RootScopeModule);
+        }
+        providers.push({ provide: _angular_core.ɵAPP_ROOT, useValue: this._isRoot });
+        var imports = [rootScopeImports, this.ngModule, this._imports];
         var schemas = this._schemas;
-        var DynamicTestModule = (function () {
+        var DynamicTestModule = /** @class */ (function () {
             function DynamicTestModule() {
             }
-            DynamicTestModule.decorators = [
-                { type: _angular_core.NgModule, args: [{ providers: providers, declarations: declarations, imports: imports, schemas: schemas },] },
-            ];
-            /** @nocollapse */
-            DynamicTestModule.ctorParameters = function () { return []; };
+            DynamicTestModule = __decorate([
+                _angular_core.NgModule({ providers: providers, declarations: declarations, imports: imports, schemas: schemas, jit: true })
+            ], DynamicTestModule);
             return DynamicTestModule;
         }());
         var compilerFactory = this.platform.injector.get(TestingCompilerFactory);
         this._compiler = compilerFactory.createTestingCompiler(this._compilerOptions);
-        this._compiler.loadAotSummaries(this._aotSummaries);
+        for (var _i = 0, _a = [this._testEnvAotSummaries].concat(this._aotSummaries); _i < _a.length; _i++) {
+            var summary = _a[_i];
+            this._compiler.loadAotSummaries(summary);
+        }
         this._moduleOverrides.forEach(function (entry) { return _this._compiler.overrideModule(entry[0], entry[1]); });
         this._componentOverrides.forEach(function (entry) { return _this._compiler.overrideComponent(entry[0], entry[1]); });
         this._directiveOverrides.forEach(function (entry) { return _this._compiler.overrideDirective(entry[0], entry[1]); });
         this._pipeOverrides.forEach(function (entry) { return _this._compiler.overridePipe(entry[0], entry[1]); });
         return DynamicTestModule;
     };
-    TestBed.prototype._assertNotInstantiated = function (methodName, methodDescription) {
+    TestBedViewEngine.prototype._assertNotInstantiated = function (methodName, methodDescription) {
         if (this._instantiated) {
             throw new Error("Cannot " + methodDescription + " when the test module has already been instantiated. " +
                 ("Make sure you are not using `inject` before `" + methodName + "`."));
         }
     };
-    TestBed.prototype.get = function (token, notFoundValue) {
+    TestBedViewEngine.prototype.get = function (token, notFoundValue) {
         if (notFoundValue === void 0) { notFoundValue = _angular_core.Injector.THROW_IF_NOT_FOUND; }
         this._initIfNeeded();
         if (token === TestBed) {
@@ -1040,36 +1784,45 @@ var TestBed = (function () {
         var result = this._moduleRef.injector.get(token, UNDEFINED);
         return result === UNDEFINED ? this._compiler.injector.get(token, notFoundValue) : result;
     };
-    TestBed.prototype.execute = function (tokens, fn, context) {
+    TestBedViewEngine.prototype.execute = function (tokens, fn, context) {
         var _this = this;
         this._initIfNeeded();
         var params = tokens.map(function (t) { return _this.get(t); });
         return fn.apply(context, params);
     };
-    TestBed.prototype.overrideModule = function (ngModule, override) {
+    TestBedViewEngine.prototype.overrideModule = function (ngModule, override) {
         this._assertNotInstantiated('overrideModule', 'override module metadata');
         this._moduleOverrides.push([ngModule, override]);
     };
-    TestBed.prototype.overrideComponent = function (component, override) {
+    TestBedViewEngine.prototype.overrideComponent = function (component, override) {
         this._assertNotInstantiated('overrideComponent', 'override component metadata');
         this._componentOverrides.push([component, override]);
     };
-    TestBed.prototype.overrideDirective = function (directive, override) {
+    TestBedViewEngine.prototype.overrideDirective = function (directive, override) {
         this._assertNotInstantiated('overrideDirective', 'override directive metadata');
         this._directiveOverrides.push([directive, override]);
     };
-    TestBed.prototype.overridePipe = function (pipe, override) {
+    TestBedViewEngine.prototype.overridePipe = function (pipe, override) {
         this._assertNotInstantiated('overridePipe', 'override pipe metadata');
         this._pipeOverrides.push([pipe, override]);
     };
-    TestBed.prototype.overrideProvider = function (token, provider) {
+    TestBedViewEngine.prototype.overrideProvider = function (token, provider) {
         this.overrideProviderImpl(token, provider);
     };
-    TestBed.prototype.deprecatedOverrideProvider = function (token, provider) {
-        this.overrideProviderImpl(token, provider, /* deprecated */ /* deprecated */ true);
+    TestBedViewEngine.prototype.deprecatedOverrideProvider = function (token, provider) {
+        this.overrideProviderImpl(token, provider, /* deprecated */ true);
     };
-    TestBed.prototype.overrideProviderImpl = function (token, provider, deprecated) {
+    TestBedViewEngine.prototype.overrideProviderImpl = function (token, provider, deprecated) {
         if (deprecated === void 0) { deprecated = false; }
+        if (typeof token !== 'string' && token.ngInjectableDef &&
+            token.ngInjectableDef.providedIn === 'root') {
+            if (provider.useFactory) {
+                this._rootProviderOverrides.push({ provide: token, useFactory: provider.useFactory, deps: provider.deps || [] });
+            }
+            else {
+                this._rootProviderOverrides.push({ provide: token, useValue: provider.useValue });
+            }
+        }
         var flags = 0;
         var value;
         if (provider.useFactory) {
@@ -1103,7 +1856,19 @@ var TestBed = (function () {
         });
         _angular_core.ɵoverrideProvider({ token: token, flags: flags, deps: deps, value: value, deprecatedBehavior: deprecated });
     };
-    TestBed.prototype.createComponent = function (component) {
+    TestBedViewEngine.prototype.overrideTemplateUsingTestingModule = function (component, template) {
+        this._assertNotInstantiated('overrideTemplateUsingTestingModule', 'override template');
+        var OverrideComponent = /** @class */ (function () {
+            function OverrideComponent() {
+            }
+            OverrideComponent = __decorate([
+                _angular_core.Component({ selector: 'empty', template: template, jit: true })
+            ], OverrideComponent);
+            return OverrideComponent;
+        }());
+        this._templateOverrides.push({ component: component, templateOf: OverrideComponent });
+    };
+    TestBedViewEngine.prototype.createComponent = function (component) {
         var _this = this;
         this._initIfNeeded();
         var componentFactory = this._compiler.getComponentFactory(component);
@@ -1124,14 +1889,30 @@ var TestBed = (function () {
         this._activeFixtures.push(fixture);
         return fixture;
     };
-    return TestBed;
+    return TestBedViewEngine;
 }());
-var _testBed = (null);
 /**
+ * @description
+ * Configures and initializes environment for unit testing and provides methods for
+ * creating components and services in unit tests.
+ *
+ * `TestBed` is the primary api for writing unit tests for Angular applications and libraries.
+ *
+ * Note: Use `TestBed` in tests. It will be set to either `TestBedViewEngine` or `TestBedRender3`
+ * according to the compiler used.
+ */
+var TestBed = _angular_core.ɵivyEnabled ? TestBedRender3 : TestBedViewEngine;
+/**
+ * Returns a singleton of the applicable `TestBed`.
+ *
+ * It will be either an instance of `TestBedViewEngine` or `TestBedRender3`.
+ *
  * @experimental
  */
-function getTestBed() {
-    return _testBed = _testBed || new TestBed();
+var getTestBed = _angular_core.ɵivyEnabled ? _getTestBedRender3 : _getTestBedViewEngine;
+var testBed;
+function _getTestBedViewEngine() {
+    return testBed = testBed || new TestBedViewEngine();
 }
 /**
  * Allows injecting dependencies in `beforeEach()` and `it()`.
@@ -1155,7 +1936,7 @@ function getTestBed() {
  * eventually
  *   becomes `it('...', @Inject (object: AClass, async: AsyncTestCompleter) => { ... });`
  *
- * @stable
+ *
  */
 function inject(tokens, fn) {
     var testBed = getTestBed();
@@ -1180,7 +1961,7 @@ function inject(tokens, fn) {
 /**
  * @experimental
  */
-var InjectSetupWrapper = (function () {
+var InjectSetupWrapper = /** @class */ (function () {
     function InjectSetupWrapper(_moduleDef) {
         this._moduleDef = _moduleDef;
     }
@@ -1238,6 +2019,15 @@ if (_global$1.beforeEach) {
 // work.
 var __core_private_testing_placeholder__ = '';
 
+exports.ɵb = TestBedRender3;
+exports.ɵc = _getTestBedRender3;
+exports.ɵa = TestBedViewEngine;
+exports.TestBed = TestBed;
+exports.getTestBed = getTestBed;
+exports.inject = inject;
+exports.InjectSetupWrapper = InjectSetupWrapper;
+exports.withModule = withModule;
+exports.ɵMetadataOverrider = MetadataOverrider;
 exports.async = async;
 exports.ComponentFixture = ComponentFixture;
 exports.resetFakeAsyncZone = resetFakeAsyncZone;
@@ -1249,11 +2039,6 @@ exports.flushMicrotasks = flushMicrotasks;
 exports.TestComponentRenderer = TestComponentRenderer;
 exports.ComponentFixtureAutoDetect = ComponentFixtureAutoDetect;
 exports.ComponentFixtureNoNgZone = ComponentFixtureNoNgZone;
-exports.TestBed = TestBed;
-exports.getTestBed = getTestBed;
-exports.inject = inject;
-exports.InjectSetupWrapper = InjectSetupWrapper;
-exports.withModule = withModule;
 exports.__core_private_testing_placeholder__ = __core_private_testing_placeholder__;
 exports.ɵTestingCompiler = TestingCompiler;
 exports.ɵTestingCompilerFactory = TestingCompilerFactory;
