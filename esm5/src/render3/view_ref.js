@@ -11,7 +11,7 @@
  */
 import * as tslib_1 from "tslib";
 import { checkNoChanges, checkNoChangesInRootView, detectChanges, detectChangesInRootView, getRendererFactory, markViewDirty, storeCleanupFn, viewAttached } from './instructions';
-import { FLAGS } from './interfaces/view';
+import { FLAGS, PARENT } from './interfaces/view';
 import { destroyLView } from './node_manipulation';
 /**
  * @record
@@ -24,33 +24,25 @@ var /**
  * @template T
  */
 ViewRef = /** @class */ (function () {
-    function ViewRef(_view, context) {
-        this._view = _view;
+    function ViewRef(_view, _context, _componentIndex) {
+        this._context = _context;
+        this._componentIndex = _componentIndex;
         this._appRef = null;
         this._viewContainerRef = null;
         /**
          * \@internal
          */
-        this._lViewNode = null;
-        this.context = /** @type {?} */ ((context));
+        this._tViewNode = null;
+        this._view = _view;
     }
-    /** @internal */
-    /**
-     * \@internal
-     * @param {?} view
-     * @param {?} context
-     * @return {?}
-     */
-    ViewRef.prototype._setComponentContext = /**
-     * \@internal
-     * @param {?} view
-     * @param {?} context
-     * @return {?}
-     */
-    function (view, context) {
-        this._view = view;
-        this.context = context;
-    };
+    Object.defineProperty(ViewRef.prototype, "context", {
+        get: /**
+         * @return {?}
+         */
+        function () { return this._context ? this._context : this._lookUpContext(); },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(ViewRef.prototype, "destroyed", {
         get: /**
          * @return {?}
@@ -643,6 +635,15 @@ ViewRef = /** @class */ (function () {
      * @return {?}
      */
     function (appRef) { this._appRef = appRef; };
+    /**
+     * @return {?}
+     */
+    ViewRef.prototype._lookUpContext = /**
+     * @return {?}
+     */
+    function () {
+        return this._context = /** @type {?} */ (((this._view[PARENT]))[this._componentIndex]);
+    };
     return ViewRef;
 }());
 /**
@@ -658,13 +659,18 @@ if (false) {
      * \@internal
      * @type {?}
      */
-    ViewRef.prototype._lViewNode;
-    /** @type {?} */
-    ViewRef.prototype.context;
+    ViewRef.prototype._view;
+    /**
+     * \@internal
+     * @type {?}
+     */
+    ViewRef.prototype._tViewNode;
     /** @type {?} */
     ViewRef.prototype.rootNodes;
     /** @type {?} */
-    ViewRef.prototype._view;
+    ViewRef.prototype._context;
+    /** @type {?} */
+    ViewRef.prototype._componentIndex;
 }
 /**
  * \@internal
@@ -677,7 +683,7 @@ var /**
 RootViewRef = /** @class */ (function (_super) {
     tslib_1.__extends(RootViewRef, _super);
     function RootViewRef(_view) {
-        var _this = _super.call(this, _view, null) || this;
+        var _this = _super.call(this, _view, null, -1) || this;
         _this._view = _view;
         return _this;
     }

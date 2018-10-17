@@ -9,7 +9,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { NEXT, PARENT, QUERIES } from './view';
+import { HOST, NEXT, PARENT, QUERIES } from './view';
 /** *
  * Below are constants for LContainer indices to help us look up LContainer members
  * without having to remember the specific indices.
@@ -17,11 +17,13 @@ import { NEXT, PARENT, QUERIES } from './view';
   @type {?} */
 export const ACTIVE_INDEX = 0;
 /** @type {?} */
-export const VIEWS = 4;
+export const VIEWS = 1;
 /** @type {?} */
-export const RENDER_PARENT = 5;
+export const NATIVE = 6;
+/** @type {?} */
+export const RENDER_PARENT = 7;
 /**
- * The state associated with an LContainerNode.
+ * The state associated with a container.
  *
  * This is an array so that its structure is closer to LViewData. This helps
  * when traversing the view tree (which is a mix of containers and component

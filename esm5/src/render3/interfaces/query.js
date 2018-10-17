@@ -32,7 +32,7 @@ LQueries.prototype.parent;
  */
 LQueries.prototype.clone;
 /**
- * Notify `LQueries` that a new `LNode` has been created and needs to be added to query results
+ * Notify `LQueries` that a new `TNode` has been created and needs to be added to query results
  * if matching query predicate.
  * @type {?}
  */
@@ -71,25 +71,6 @@ LQueries.prototype.removeView;
  * @type {?}
  */
 LQueries.prototype.track;
-/**
- * @template T
- */
-var /**
- * @template T
- */
-QueryReadType = /** @class */ (function () {
-    function QueryReadType() {
-    }
-    return QueryReadType;
-}());
-/**
- * @template T
- */
-export { QueryReadType };
-if (false) {
-    /** @type {?} */
-    QueryReadType.prototype.defeatStructuralTyping;
-}
 /** @type {?} */
 export var unusedValueExportToPlacateAjd = 1;
 //# sourceMappingURL=query.js.map

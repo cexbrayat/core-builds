@@ -10,8 +10,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { WrappedNodeExpr, compileInjector, compileNgModule as compileR3NgModule, jitExpression } from '@angular/compiler';
+import { getComponentDef, getDirectiveDef, getNgModuleDef, getPipeDef } from '../definition';
+import { NG_COMPONENT_DEF, NG_DIRECTIVE_DEF, NG_INJECTOR_DEF, NG_MODULE_DEF, NG_PIPE_DEF } from '../fields';
 import { angularCoreEnv } from './environment';
-import { NG_COMPONENT_DEF, NG_DIRECTIVE_DEF, NG_INJECTOR_DEF, NG_MODULE_DEF, NG_PIPE_DEF } from './fields';
 import { reflectDependencies } from './util';
 /** @type {?} */
 const EMPTY_ARRAY = [];
@@ -37,14 +38,14 @@ export function compileNgModuleDefs(moduleType, ngModule) {
     /** @type {?} */
     const declarations = flatten(ngModule.declarations || EMPTY_ARRAY);
     /** @type {?} */
-    let ngModuleDef = null;
+    /** @nocollapse */ let ngModuleDef = null;
     Object.defineProperty(moduleType, NG_MODULE_DEF, {
         get: () => {
             if (ngModuleDef === null) {
                 /** @type {?} */
                 const meta = {
                     type: wrap(moduleType),
-                    bootstrap: flatten(ngModule.bootstrap || EMPTY_ARRAY).map(wrap),
+                    bootstrap: flatten(ngModule.bootstrap || EMPTY_ARRAY).map(wrapReference),
                     declarations: declarations.map(wrapReference),
                     imports: flatten(ngModule.imports || EMPTY_ARRAY)
                         .map(expandModuleWithProviders)
@@ -64,7 +65,7 @@ export function compileNgModuleDefs(moduleType, ngModule) {
         configurable: !!ngDevMode,
     });
     /** @type {?} */
-    let ngInjectorDef = null;
+    /** @nocollapse */ let ngInjectorDef = null;
     Object.defineProperty(moduleType, NG_INJECTOR_DEF, {
         get: () => {
             if (ngInjectorDef === null) {
@@ -107,7 +108,7 @@ function setScopeOnDeclaredComponents(moduleType, ngModule) {
             /** @type {?} */
             const component = /** @type {?} */ (declaration);
             /** @type {?} */
-            const componentDef = component.ngComponentDef;
+            const componentDef = /** @type {?} */ ((getComponentDef(component)));
             patchComponentDefWithScope(componentDef, transitiveScopes);
         }
         else if (!declaration.hasOwnProperty(NG_DIRECTIVE_DEF) && !declaration.hasOwnProperty(NG_PIPE_DEF)) {
@@ -126,9 +127,9 @@ function setScopeOnDeclaredComponents(moduleType, ngModule) {
  */
 export function patchComponentDefWithScope(componentDef, transitiveScopes) {
     componentDef.directiveDefs = () => Array.from(transitiveScopes.compilation.directives)
-        .map(dir => dir.ngDirectiveDef || dir.ngComponentDef)
+        .map(dir => getDirectiveDef(dir) || /** @type {?} */ ((getComponentDef(dir))))
         .filter(def => !!def);
-    componentDef.pipeDefs = () => Array.from(transitiveScopes.compilation.pipes).map(pipe => pipe.ngPipeDef);
+    componentDef.pipeDefs = () => Array.from(transitiveScopes.compilation.pipes).map(pipe => /** @type {?} */ ((getPipeDef(pipe))));
 }
 /**
  * Compute the pair of transitive scopes (compilation scope and exported scope) for a given module.
@@ -145,7 +146,7 @@ export function transitiveScopesFor(moduleType) {
         throw new Error(`${moduleType.name} does not have an ngModuleDef`);
     }
     /** @type {?} */
-    const def = moduleType.ngModuleDef;
+    const def = /** @type {?} */ ((getNgModuleDef(moduleType)));
     if (def.transitiveCompileScopes !== null) {
         return def.transitiveCompileScopes;
     }
@@ -163,7 +164,7 @@ export function transitiveScopesFor(moduleType) {
     def.declarations.forEach(declared => {
         /** @type {?} */
         const declaredWithDefs = /** @type {?} */ (declared);
-        if (declaredWithDefs.ngPipeDef !== undefined) {
+        if (getPipeDef(declaredWithDefs)) {
             scopes.compilation.pipes.add(declared);
         }
         else {
@@ -201,7 +202,7 @@ export function transitiveScopesFor(moduleType) {
                 scopes.exported.pipes.add(entry);
             });
         }
-        else if (exportedTyped.ngPipeDef !== undefined) {
+        else if (getNgModuleDef(exportedTyped)) {
             scopes.exported.pipes.add(exportedTyped);
         }
         else {
@@ -268,6 +269,6 @@ function isModuleWithProviders(value) {
  * @return {?}
  */
 function isNgModule(value) {
-    return (/** @type {?} */ (value)).ngModuleDef !== undefined;
+    return !!getNgModuleDef(value);
 }
 //# sourceMappingURL=module.js.map

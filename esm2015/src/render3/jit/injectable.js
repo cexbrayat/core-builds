@@ -11,8 +11,8 @@
  */
 import { LiteralExpr, WrappedNodeExpr, compileInjectable as compileR3Injectable, jitExpression } from '@angular/compiler';
 import { getClosureSafeProperty } from '../../util/property';
+import { NG_INJECTABLE_DEF } from '../fields';
 import { angularCoreEnv } from './environment';
-import { NG_INJECTABLE_DEF } from './fields';
 import { convertDependencies, reflectDependencies } from './util';
 /**
  * Compile an Angular injectable according to its `Injectable` metadata, and patch the resulting
@@ -112,11 +112,9 @@ var UseClassProvider;
 function isUseClassProvider(meta) {
     return (/** @type {?} */ (meta)).useClass !== undefined;
 }
+const ɵ0 = getClosureSafeProperty;
 /** @type {?} */
-const GET_PROPERTY_NAME = /** @type {?} */ ({});
-const ɵ0 = GET_PROPERTY_NAME;
-/** @type {?} */
-const USE_VALUE = getClosureSafeProperty({ provide: String, useValue: ɵ0 }, GET_PROPERTY_NAME);
+const USE_VALUE = getClosureSafeProperty({ provide: String, useValue: ɵ0 });
 /**
  * @param {?} meta
  * @return {?}

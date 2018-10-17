@@ -7,7 +7,7 @@
  */
 import { QueryList } from '../../linker';
 import { Type } from '../../type';
-import { LNode } from './node';
+import { TContainerNode, TElementContainerNode, TElementNode } from './node';
 /** Used for tracking queries (e.g. ViewChild, ContentChild). */
 export interface LQueries {
     /**
@@ -26,10 +26,10 @@ export interface LQueries {
      */
     clone(): LQueries;
     /**
-     * Notify `LQueries` that a new `LNode` has been created and needs to be added to query results
+     * Notify `LQueries` that a new `TNode` has been created and needs to be added to query results
      * if matching query predicate.
      */
-    addNode(node: LNode): LQueries | null;
+    addNode(tNode: TElementNode | TContainerNode | TElementContainerNode): LQueries | null;
     /**
      * Notify `LQueries` that a new LContainer was added to ivy data structures. As a result we need
      * to prepare room for views that might be inserted into this container.
@@ -58,9 +58,6 @@ export interface LQueries {
      * @param descend If true the query will recursively apply to the children.
      * @param read Indicates which token should be read from DI for this query.
      */
-    track<T>(queryList: QueryList<T>, predicate: Type<any> | string[], descend?: boolean, read?: QueryReadType<T> | Type<T>): void;
-}
-export declare class QueryReadType<T> {
-    private defeatStructuralTyping;
+    track<T>(queryList: QueryList<T>, predicate: Type<any> | string[], descend?: boolean, read?: Type<T>): void;
 }
 export declare const unusedValueExportToPlacateAjd = 1;

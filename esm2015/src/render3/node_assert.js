@@ -11,24 +11,24 @@
  */
 import { assertDefined, assertEqual } from './assert';
 /**
- * @param {?} node
+ * @param {?} tNode
  * @param {?} type
  * @return {?}
  */
-export function assertNodeType(node, type) {
-    assertDefined(node, 'should be called with a node');
-    assertEqual(node.tNode.type, type, `should be a ${typeName(type)}`);
+export function assertNodeType(tNode, type) {
+    assertDefined(tNode, 'should be called with a TNode');
+    assertEqual(tNode.type, type, `should be a ${typeName(type)}`);
 }
 /**
- * @param {?} node
+ * @param {?} tNode
  * @param {...?} types
  * @return {?}
  */
-export function assertNodeOfPossibleTypes(node, ...types) {
-    assertDefined(node, 'should be called with a node');
+export function assertNodeOfPossibleTypes(tNode, ...types) {
+    assertDefined(tNode, 'should be called with a TNode');
     /** @type {?} */
-    const found = types.some(type => node.tNode.type === type);
-    assertEqual(found, true, `Should be one of ${types.map(typeName).join(', ')} but got ${typeName(node.tNode.type)}`);
+    const found = types.some(type => tNode.type === type);
+    assertEqual(found, true, `Should be one of ${types.map(typeName).join(', ')} but got ${typeName(tNode.type)}`);
 }
 /**
  * @param {?} type

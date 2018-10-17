@@ -279,7 +279,7 @@ var IterableDiffers = /** @class */ (function () {
 }());
 export { IterableDiffers };
 if (false) {
-    /** @type {?} */
+    /** @nocollapse @type {?} */
     IterableDiffers.ngInjectableDef;
     /**
      * @deprecated v4.0.0 - Should be private

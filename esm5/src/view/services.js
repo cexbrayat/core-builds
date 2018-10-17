@@ -10,8 +10,10 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { DebugElement, DebugNode, EventListener, getDebugNode, indexDebugNode, removeDebugNodeFromIndex } from '../debug/debug_node';
+import { getInjectableDef } from '../di/defs';
 import { ErrorHandler } from '../error_handler';
 import { isDevMode } from '../is_dev_mode';
+import { ivyEnabled } from '../ivy_switch/compiler/index';
 import { RendererFactory2 } from '../render/api';
 import { Sanitizer } from '../sanitization/security';
 import { tokenKey } from '../view/util';
@@ -207,8 +209,10 @@ var viewDefOverrides = new Map();
  */
 function debugOverrideProvider(override) {
     providerOverrides.set(override.token, override);
-    if (typeof override.token === 'function' && override.token.ngInjectableDef &&
-        typeof override.token.ngInjectableDef.providedIn === 'function') {
+    /** @type {?} */
+    var injectableDef;
+    if (typeof override.token === 'function' && (injectableDef = getInjectableDef(override.token)) &&
+        typeof injectableDef.providedIn === 'function') {
         providerOverridesWithScope.set(/** @type {?} */ (override.token), override);
     }
 }
@@ -338,7 +342,7 @@ function applyProviderOverridesToNgModule(def) {
         });
         def.modules.forEach(function (module) {
             providerOverridesWithScope.forEach(function (override, token) {
-                if (token.ngInjectableDef.providedIn === module) {
+                if (/** @type {?} */ ((getInjectableDef(token))).providedIn === module) {
                     hasOverrides = true;
                     hasDeprecatedOverrides = hasDeprecatedOverrides || override.deprecatedBehavior;
                 }
@@ -372,7 +376,7 @@ function applyProviderOverridesToNgModule(def) {
             /** @type {?} */
             var moduleSet_1 = new Set(def.modules);
             providerOverridesWithScope.forEach(function (override, token) {
-                if (moduleSet_1.has(token.ngInjectableDef.providedIn)) {
+                if (moduleSet_1.has(/** @type {?} */ ((getInjectableDef(token))).providedIn)) {
                     /** @type {?} */
                     var provider = {
                         token: token,
@@ -1039,14 +1043,15 @@ var DebugRenderer2 = /** @class */ (function () {
         this.debugContextFactory = getCurrentDebugContext;
         this.data = this.delegate.data;
     }
-    Object.defineProperty(DebugRenderer2.prototype, "debugContext", {
-        get: /**
-         * @return {?}
-         */
-        function () { return this.debugContextFactory(); },
-        enumerable: true,
-        configurable: true
-    });
+    /**
+     * @param {?} nativeElement
+     * @return {?}
+     */
+    DebugRenderer2.prototype.createDebugContext = /**
+     * @param {?} nativeElement
+     * @return {?}
+     */
+    function (nativeElement) { return this.debugContextFactory(nativeElement); };
     /**
      * @param {?} node
      * @return {?}
@@ -1082,7 +1087,7 @@ var DebugRenderer2 = /** @class */ (function () {
         /** @type {?} */
         var el = this.delegate.createElement(name, namespace);
         /** @type {?} */
-        var debugCtx = this.debugContext;
+        var debugCtx = this.createDebugContext(el);
         if (debugCtx) {
             /** @type {?} */
             var debugEl = new DebugElement(el, null, debugCtx);
@@ -1103,7 +1108,7 @@ var DebugRenderer2 = /** @class */ (function () {
         /** @type {?} */
         var comment = this.delegate.createComment(value);
         /** @type {?} */
-        var debugCtx = this.debugContext;
+        var debugCtx = this.createDebugContext(comment);
         if (debugCtx) {
             indexDebugNode(new DebugNode(comment, null, debugCtx));
         }
@@ -1121,7 +1126,7 @@ var DebugRenderer2 = /** @class */ (function () {
         /** @type {?} */
         var text = this.delegate.createText(value);
         /** @type {?} */
-        var debugCtx = this.debugContext;
+        var debugCtx = this.createDebugContext(text);
         if (debugCtx) {
             indexDebugNode(new DebugNode(text, null, debugCtx));
         }
@@ -1205,7 +1210,7 @@ var DebugRenderer2 = /** @class */ (function () {
         /** @type {?} */
         var el = this.delegate.selectRootElement(selectorOrNode, preserveContent);
         /** @type {?} */
-        var debugCtx = getCurrentDebugContext();
+        var debugCtx = getCurrentDebugContext() || (ivyEnabled ? this.createDebugContext(el) : null);
         if (debugCtx) {
             indexDebugNode(new DebugElement(el, null, debugCtx));
         }

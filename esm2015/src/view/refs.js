@@ -736,7 +736,7 @@ class RendererAdapter {
     /**
      * @param {?} renderElement
      * @param {?} namespaceAndName
-     * @param {?} attributeValue
+     * @param {?=} attributeValue
      * @return {?}
      */
     setElementAttribute(renderElement, namespaceAndName, attributeValue) {
@@ -772,7 +772,7 @@ class RendererAdapter {
     /**
      * @param {?} renderElement
      * @param {?} styleName
-     * @param {?} styleValue
+     * @param {?=} styleValue
      * @return {?}
      */
     setElementStyle(renderElement, styleName, styleValue) {

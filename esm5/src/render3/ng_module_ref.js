@@ -16,6 +16,7 @@ import { NgModuleFactory as viewEngine_NgModuleFactory, NgModuleRef as viewEngin
 import { stringify } from '../util';
 import { assertDefined } from './assert';
 import { ComponentFactoryResolver } from './component_ref';
+import { getNgModuleDef } from './definition';
 /**
  * @record
  */
@@ -42,9 +43,9 @@ NgModuleRef = /** @class */ (function (_super) {
         _this._bootstrapComponents = [];
         _this.destroyCbs = [];
         /** @type {?} */
-        var ngModuleDef = (/** @type {?} */ ((ngModuleType))).ngModuleDef;
+        /** @nocollapse */ var ngModuleDef = getNgModuleDef(ngModuleType);
         ngDevMode && assertDefined(ngModuleDef, "NgModule '" + stringify(ngModuleType) + "' is not a subtype of 'NgModuleType'.");
-        _this._bootstrapComponents = ngModuleDef.bootstrap;
+        _this._bootstrapComponents = /** @type {?} */ ((ngModuleDef)).bootstrap;
         /** @type {?} */
         var additionalProviders = [
             COMPONENT_FACTORY_RESOLVER, {

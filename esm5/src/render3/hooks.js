@@ -10,7 +10,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { assertEqual } from './assert';
-import { DIRECTIVES, FLAGS } from './interfaces/view';
+import { FLAGS } from './interfaces/view';
 /**
  * If this is the first template pass, any ngOnInit or ngDoCheck hooks will be queued into
  * TView.initHooks during directiveCreate.
@@ -19,7 +19,7 @@ import { DIRECTIVES, FLAGS } from './interfaces/view';
  * directive index), then saved in the even indices of the initHooks array. The odd indices
  * hold the hook functions themselves.
  *
- * @param {?} index The index of the directive in LViewData[DIRECTIVES]
+ * @param {?} index The index of the directive in LViewData
  * @param {?} onInit
  * @param {?} doCheck
  * @param {?} tView The current TView
@@ -56,7 +56,7 @@ export function queueLifecycleHooks(flags, tView) {
         // hooks for projected components and directives must be called *before* their hosts.
         for (var i = start; i < end; i++) {
             /** @type {?} */
-            var def = /** @type {?} */ ((tView.directives))[i];
+            var def = /** @type {?} */ (tView.data[i]);
             queueContentHooks(def, tView, i);
             queueViewHooks(def, tView, i);
             queueDestroyHooks(def, tView, i);
@@ -117,7 +117,7 @@ function queueDestroyHooks(def, tView, i) {
  */
 export function executeInitHooks(currentView, tView, creationMode) {
     if (currentView[FLAGS] & 16 /* RunInit */) {
-        executeHooks(/** @type {?} */ ((currentView[DIRECTIVES])), tView.initHooks, tView.checkHooks, creationMode);
+        executeHooks(currentView, tView.initHooks, tView.checkHooks, creationMode);
         currentView[FLAGS] &= ~16 /* RunInit */;
     }
 }
@@ -141,13 +141,13 @@ export function executeHooks(data, allHooks, checkHooks, creationMode) {
  * Calls lifecycle hooks with their contexts, skipping init hooks if it's not
  * creation mode.
  *
- * @param {?} data
+ * @param {?} currentView The current view
  * @param {?} arr The array in which the hooks are found
  * @return {?}
  */
-export function callHooks(data, arr) {
+export function callHooks(currentView, arr) {
     for (var i = 0; i < arr.length; i += 2) {
-        (/** @type {?} */ (arr[i + 1])).call(data[/** @type {?} */ (arr[i])]);
+        (/** @type {?} */ (arr[i + 1])).call(currentView[/** @type {?} */ (arr[i])]);
     }
 }
 //# sourceMappingURL=hooks.js.map

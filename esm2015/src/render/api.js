@@ -10,6 +10,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { InjectionToken } from '../di/injection_token';
+import { R3_RENDERER2_FACTORY } from '../ivy_switch/runtime/index';
 /**
  * @deprecated Use `RendererType2` (and `Renderer2`) instead.
  */
@@ -46,7 +47,7 @@ if (false) {
     RenderComponentType.prototype.animations;
 }
 /**
- * @deprecated Debug info is handeled internally in the view engine now.
+ * @deprecated Debug info is handled internally in the view engine now.
  * @abstract
  */
 export class RenderDebugInfo {
@@ -196,7 +197,7 @@ if (false) {
      * @abstract
      * @param {?} renderElement
      * @param {?} attributeName
-     * @param {?} attributeValue
+     * @param {?=} attributeValue
      * @return {?}
      */
     Renderer.prototype.setElementAttribute = function (renderElement, attributeName, attributeValue) { };
@@ -221,7 +222,7 @@ if (false) {
      * @abstract
      * @param {?} renderElement
      * @param {?} styleName
-     * @param {?} styleValue
+     * @param {?=} styleValue
      * @return {?}
      */
     Renderer.prototype.setElementStyle = function (renderElement, styleName, styleValue) { };
@@ -384,7 +385,16 @@ RendererStyleFlags2[RendererStyleFlags2.DashCase] = 'DashCase';
  */
 export class Renderer2 {
 }
+/**
+ * \@internal
+ */
+Renderer2.__NG_ELEMENT_ID__ = () => R3_RENDERER2_FACTORY();
 if (false) {
+    /**
+     * \@internal
+     * @type {?}
+     */
+    Renderer2.__NG_ELEMENT_ID__;
     /**
      * If null or undefined, the view engine won't call it.
      * This is used as a performance optimization for production mode.

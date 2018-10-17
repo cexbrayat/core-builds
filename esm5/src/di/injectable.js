@@ -9,7 +9,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { R3_COMPILE_INJECTABLE } from '../ivy_switch';
+import { R3_COMPILE_INJECTABLE } from '../ivy_switch/compiler/index';
 import { makeDecorator } from '../util/decorators';
 /** @typedef {?} */
 var InjectableProvider;

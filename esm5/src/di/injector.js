@@ -10,7 +10,8 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { stringify } from '../util';
-import { defineInjectable } from './defs';
+import { getClosureSafeProperty } from '../util/property';
+import { defineInjectable, getInjectableDef } from './defs';
 import { resolveForwardRef } from './forward_ref';
 import { InjectionToken } from './injection_token';
 import { Inject, Optional, Self, SkipSelf } from './metadata';
@@ -128,7 +129,7 @@ if (false) {
     Injector.THROW_IF_NOT_FOUND;
     /** @type {?} */
     Injector.NULL;
-    /** @type {?} */
+    /** @nocollapse @type {?} */
     Injector.ngInjectableDef;
     /**
      * Retrieves an instance from the injector based on the provided token.
@@ -166,9 +167,7 @@ var MULTI_PROVIDER_FN = function () {
 };
 var ɵ1 = MULTI_PROVIDER_FN;
 /** @type {?} */
-var GET_PROPERTY_NAME = /** @type {?} */ ({});
-/** @type {?} */
-export var USE_VALUE = getClosureSafeProperty({ provide: String, useValue: GET_PROPERTY_NAME });
+export var USE_VALUE = getClosureSafeProperty({ provide: String, useValue: getClosureSafeProperty });
 /** @type {?} */
 var NG_TOKEN_PATH = 'ngTokenPath';
 /** @type {?} */
@@ -553,19 +552,6 @@ function formatError(text, obj, source) {
 function staticError(text, obj) {
     return new Error(formatError(text, obj));
 }
-/**
- * @template T
- * @param {?} objWithPropertyToExtract
- * @return {?}
- */
-function getClosureSafeProperty(objWithPropertyToExtract) {
-    for (var key in objWithPropertyToExtract) {
-        if (objWithPropertyToExtract[key] === GET_PROPERTY_NAME) {
-            return key;
-        }
-    }
-    throw Error('!prop');
-}
 /** @enum {number} */
 var InjectFlags = {
     Default: 0,
@@ -612,7 +598,7 @@ export function inject(token, flags) {
     }
     else if (_currentInjector === null) {
         /** @type {?} */
-        var injectableDef = (/** @type {?} */ (token)).ngInjectableDef;
+        var injectableDef = getInjectableDef(token);
         if (injectableDef && injectableDef.providedIn == 'root') {
             return injectableDef.value === undefined ? injectableDef.value = injectableDef.factory() :
                 injectableDef.value;

@@ -54,7 +54,7 @@ function compileNgModuleFactory__PRE_NGCC__(injector, options, moduleType) {
  * @param {?} moduleType
  * @return {?}
  */
-function compileNgModuleFactory__POST_NGCC__(injector, options, moduleType) {
+export function compileNgModuleFactory__POST_NGCC__(injector, options, moduleType) {
     ngDevMode && assertNgModuleType(moduleType);
     return Promise.resolve(new R3NgModuleFactory(moduleType));
 }

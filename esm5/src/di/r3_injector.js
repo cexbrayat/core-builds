@@ -10,6 +10,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { stringify } from '../util';
+import { getInjectableDef, getInjectorDef } from './defs';
 import { resolveForwardRef } from './forward_ref';
 import { InjectionToken } from './injection_token';
 import { INJECTOR, NullInjector, THROW_IF_NOT_FOUND, USE_VALUE, inject, injectArgs, setCurrentInjector } from './injector';
@@ -166,10 +167,8 @@ var R3Injector = /** @class */ (function () {
                 var record = this.records.get(token);
                 if (record === undefined) {
                     /** @type {?} */
-                    var def = couldBeInjectableType(token) &&
-                        (/** @type {?} */ (token)).ngInjectableDef ||
-                        undefined;
-                    if (def !== undefined && this.injectableDefInScope(def)) {
+                    var def = couldBeInjectableType(token) && getInjectableDef(token);
+                    if (def && this.injectableDefInScope(def)) {
                         // Found an ngInjectableDef and it's scoped to this injector. Pretend as if it was here
                         // all along.
                         record = injectableDefRecord(token);
@@ -219,7 +218,7 @@ var R3Injector = /** @class */ (function () {
         var _this = this;
         defOrWrappedDef = resolveForwardRef(defOrWrappedDef);
         /** @type {?} */
-        var def = /** @type {?} */ ((/** @type {?} */ (defOrWrappedDef)).ngInjectorDef);
+        var def = getInjectorDef(defOrWrappedDef);
         /** @type {?} */
         var ngModule = (def == null) && (/** @type {?} */ (defOrWrappedDef)).ngModule || undefined;
         /** @type {?} */
@@ -230,7 +229,7 @@ var R3Injector = /** @class */ (function () {
         // Finally, if defOrWrappedType was an `InjectorDefTypeWithProviders`, then the actual
         // `InjectorDef` is on its `ngModule`.
         if (ngModule !== undefined) {
-            def = ngModule.ngInjectorDef;
+            def = getInjectorDef(ngModule);
         }
         // If no definition was found, it might be from exports. Remove it.
         if (def == null) {
@@ -391,8 +390,8 @@ if (false) {
  */
 function injectableDefRecord(token) {
     /** @type {?} */
-    var def = /** @type {?} */ ((/** @type {?} */ (token)).ngInjectableDef);
-    if (def === undefined) {
+    var injectableDef = getInjectableDef(/** @type {?} */ (token));
+    if (injectableDef === null) {
         if (token instanceof InjectionToken) {
             throw new Error("Token " + stringify(token) + " is missing an ngInjectableDef definition.");
         }
@@ -400,7 +399,7 @@ function injectableDefRecord(token) {
         // no-args constructor.
         return makeRecord(function () { return new (/** @type {?} */ (token))(); });
     }
-    return makeRecord(def.factory);
+    return makeRecord(injectableDef.factory);
 }
 /**
  * @param {?} provider

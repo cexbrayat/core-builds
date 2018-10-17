@@ -10,7 +10,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { checkNoChanges, checkNoChangesInRootView, detectChanges, detectChangesInRootView, getRendererFactory, markViewDirty, storeCleanupFn, viewAttached } from './instructions';
-import { FLAGS } from './interfaces/view';
+import { FLAGS, PARENT } from './interfaces/view';
 import { destroyLView } from './node_manipulation';
 /**
  * @record
@@ -22,28 +22,24 @@ export function viewEngine_ChangeDetectorRef_interface() { }
 export class ViewRef {
     /**
      * @param {?} _view
-     * @param {?} context
+     * @param {?} _context
+     * @param {?} _componentIndex
      */
-    constructor(_view, context) {
-        this._view = _view;
+    constructor(_view, _context, _componentIndex) {
+        this._context = _context;
+        this._componentIndex = _componentIndex;
         this._appRef = null;
         this._viewContainerRef = null;
         /**
          * \@internal
          */
-        this._lViewNode = null;
-        this.context = /** @type {?} */ ((context));
+        this._tViewNode = null;
+        this._view = _view;
     }
     /**
-     * \@internal
-     * @param {?} view
-     * @param {?} context
      * @return {?}
      */
-    _setComponentContext(view, context) {
-        this._view = view;
-        this.context = context;
-    }
+    get context() { return this._context ? this._context : this._lookUpContext(); }
     /**
      * @return {?}
      */
@@ -269,6 +265,12 @@ export class ViewRef {
      * @return {?}
      */
     attachToAppRef(appRef) { this._appRef = appRef; }
+    /**
+     * @return {?}
+     */
+    _lookUpContext() {
+        return this._context = /** @type {?} */ (((this._view[PARENT]))[this._componentIndex]);
+    }
 }
 if (false) {
     /** @type {?} */
@@ -279,13 +281,18 @@ if (false) {
      * \@internal
      * @type {?}
      */
-    ViewRef.prototype._lViewNode;
-    /** @type {?} */
-    ViewRef.prototype.context;
+    ViewRef.prototype._view;
+    /**
+     * \@internal
+     * @type {?}
+     */
+    ViewRef.prototype._tViewNode;
     /** @type {?} */
     ViewRef.prototype.rootNodes;
     /** @type {?} */
-    ViewRef.prototype._view;
+    ViewRef.prototype._context;
+    /** @type {?} */
+    ViewRef.prototype._componentIndex;
 }
 /**
  * \@internal
@@ -296,7 +303,7 @@ export class RootViewRef extends ViewRef {
      * @param {?} _view
      */
     constructor(_view) {
-        super(_view, null);
+        super(_view, null, -1);
         this._view = _view;
     }
     /**

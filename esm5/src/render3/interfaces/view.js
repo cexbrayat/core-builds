@@ -16,19 +16,19 @@ export var HEADER_OFFSET = 17;
 /** @type {?} */
 export var TVIEW = 0;
 /** @type {?} */
-export var PARENT = 1;
+export var FLAGS = 1;
 /** @type {?} */
-export var NEXT = 2;
+export var PARENT = 2;
 /** @type {?} */
-export var QUERIES = 3;
+export var NEXT = 3;
 /** @type {?} */
-export var FLAGS = 4;
+export var QUERIES = 4;
 /** @type {?} */
-export var HOST_NODE = 5;
+export var HOST = 5;
 /** @type {?} */
-export var BINDING_INDEX = 6;
+export var HOST_NODE = 6;
 /** @type {?} */
-export var DIRECTIVES = 7;
+export var BINDING_INDEX = 7;
 /** @type {?} */
 export var CLEANUP = 8;
 /** @type {?} */
@@ -92,6 +92,8 @@ var LViewFlags = {
     RunInit: 16,
     /** Whether or not this view is destroyed. */
     Destroyed: 32,
+    /** Whether or not this view is the root view */
+    IsRoot: 64,
 };
 export { LViewFlags };
 /**
@@ -135,7 +137,13 @@ TView.prototype.viewQuery;
  * We need this pointer to be able to efficiently find this node when inserting the view
  * into an anchor.
  *
- * If this is a `TNode` for an `LElementNode`, this is the TView of a component.
+ * If this is a `TElementNode`, this is the view of a root component. It has exactly one
+ * root TNode.
+ *
+ * If this is null, this is the view of a component that is not at root. We do not store
+ * the host TNodes for child component views because they can potentially have several
+ * different host TNodes, depending on where the component is being used. These host
+ * TNodes cannot be shared (due to different indices, etc).
  * @type {?}
  */
 TView.prototype.node;
@@ -158,12 +166,17 @@ TView.prototype.data;
  */
 TView.prototype.bindingStartIndex;
 /**
- * The index at which the data array begins to store host bindings for components
- * or directives in its template. Saving this value ensures that we can set the
- * binding root and binding index correctly before checking host bindings.
+ * The index where the "expando" section of `LViewData` begins. The expando
+ * section contains injectors, directive instances, and host binding values.
+ * Unlike the "consts" and "vars" sections of `LViewData`, the length of this
+ * section cannot be calculated at compile-time because directives are matched
+ * at runtime to preserve locality.
+ *
+ * We store this start index so we know where to start checking host bindings
+ * in `setHostBindings`.
  * @type {?}
  */
-TView.prototype.hostBindingStartIndex;
+TView.prototype.expandoStartIndex;
 /**
  * Index of the host node of the first LView or LContainer beneath this LView in
  * the hierarchy.
@@ -176,6 +189,11 @@ TView.prototype.hostBindingStartIndex;
  * @type {?}
  */
 TView.prototype.childIndex;
+/**
+ * A reference to the first child node located in the view.
+ * @type {?}
+ */
+TView.prototype.firstChild;
 /**
  * Selector matches for a node are temporarily cached on the TView so the
  * DI system can eagerly instantiate directives on the same node if they are
@@ -195,14 +213,12 @@ TView.prototype.childIndex;
  */
 TView.prototype.currentMatches;
 /**
- * Directive and component defs that have already been matched to nodes on
- * this view.
+ * Set of instructions used to process host bindings efficiently.
  *
- * Defs are stored at the same index in TView.directives[] as their instances
- * are stored in LView.directives[]. This simplifies lookup in DI.
+ * See VIEW_DATA.md for more information.
  * @type {?}
  */
-TView.prototype.directives;
+TView.prototype.expandoInstructions;
 /**
  * Full registry of directives and components that may be found in this view.
  *
@@ -326,17 +342,6 @@ TView.prototype.cleanup;
  */
 TView.prototype.components;
 /**
- * A list of indices for child directives that have host bindings.
- *
- * Even indices: Directive indices
- * Odd indices: Element indices
- *
- * Element indices are NOT adjusted for LViewData header offset because
- * they will be fed into instructions that expect the raw index (e.g. elementProperty)
- * @type {?}
- */
-TView.prototype.hostBindings;
-/**
  * A list of indices for child directives that have content queries.
  *
  * Even indices: Directive indices
@@ -344,6 +349,11 @@ TView.prototype.hostBindings;
  * @type {?}
  */
 TView.prototype.contentQueries;
+/** @enum {number} */
+var RootContextFlags = {
+    Empty: 0, DetectChanges: 1, FlushPlayers: 2,
+};
+export { RootContextFlags };
 /**
  * RootContext contains information which is shared for all components which
  * were bootstrapped with {\@link renderComponent}.
@@ -369,6 +379,16 @@ RootContext.prototype.clean;
  * @type {?}
  */
 RootContext.prototype.components;
+/**
+ * The player flushing handler to kick off all animations
+ * @type {?}
+ */
+RootContext.prototype.playerHandler;
+/**
+ * What render-related operations to run once a scheduler has been set
+ * @type {?}
+ */
+RootContext.prototype.flags;
 /** @typedef {?} */
 var HookData;
 export { HookData };

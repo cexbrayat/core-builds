@@ -9,6 +9,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { R3_CHANGE_DETECTOR_REF_FACTORY } from '../ivy_switch/runtime/index';
 /**
  * Base class for Angular Views, provides change detection functionality.
  * A change-detection tree collects all views that are to be checked for changes.
@@ -47,13 +48,22 @@
  * when the `live` property is set to false, and reattaches it when the property
  * becomes true.
  *
- * <code-example path="core/ts/change_detect/change-detection.ts" region="detach"></code-example>
+ * <code-example path="core/ts/change_detect/change-detection.ts" region="reattach"></code-example>
  *
  * @abstract
  */
 export class ChangeDetectorRef {
 }
+/**
+ * \@internal
+ */
+ChangeDetectorRef.__NG_ELEMENT_ID__ = () => R3_CHANGE_DETECTOR_REF_FACTORY();
 if (false) {
+    /**
+     * \@internal
+     * @type {?}
+     */
+    ChangeDetectorRef.__NG_ELEMENT_ID__;
     /**
      * When a view uses the {\@link ChangeDetectionStrategy#OnPush OnPush} (checkOnce)
      * change detection strategy, explicitly marks the view as changed so that

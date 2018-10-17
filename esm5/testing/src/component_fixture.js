@@ -1,4 +1,8 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -10,8 +14,15 @@ import { RendererFactory2, getDebugNode } from '@angular/core';
  * Fixture for debugging and testing a component.
  *
  *
+ * @template T
  */
-var ComponentFixture = /** @class */ (function () {
+var /**
+ * Fixture for debugging and testing a component.
+ *
+ *
+ * @template T
+ */
+ComponentFixture = /** @class */ (function () {
     function ComponentFixture(componentRef, ngZone, _autoDetect) {
         var _this = this;
         this.componentRef = componentRef;
@@ -27,7 +38,7 @@ var ComponentFixture = /** @class */ (function () {
         this._onErrorSubscription = null;
         this.changeDetectorRef = componentRef.changeDetectorRef;
         this.elementRef = componentRef.location;
-        this.debugElement = getDebugNode(this.elementRef.nativeElement);
+        this.debugElement = /** @type {?} */ (getDebugNode(this.elementRef.nativeElement));
         this.componentInstance = componentRef.instance;
         this.nativeElement = this.elementRef.nativeElement;
         this.componentRef = componentRef;
@@ -58,7 +69,7 @@ var ComponentFixture = /** @class */ (function () {
                             scheduleMicroTask(function () {
                                 if (!ngZone.hasPendingMacrotasks) {
                                     if (_this._promise !== null) {
-                                        _this._resolve(true);
+                                        /** @type {?} */ ((_this._resolve))(true);
                                         _this._resolve = null;
                                         _this._promise = null;
                                     }
@@ -72,7 +83,15 @@ var ComponentFixture = /** @class */ (function () {
             });
         }
     }
-    ComponentFixture.prototype._tick = function (checkNoChanges) {
+    /**
+     * @param {?} checkNoChanges
+     * @return {?}
+     */
+    ComponentFixture.prototype._tick = /**
+     * @param {?} checkNoChanges
+     * @return {?}
+     */
+    function (checkNoChanges) {
         this.changeDetectorRef.detectChanges();
         if (checkNoChanges) {
             this.checkNoChanges();
@@ -81,7 +100,17 @@ var ComponentFixture = /** @class */ (function () {
     /**
      * Trigger a change detection cycle for the component.
      */
-    ComponentFixture.prototype.detectChanges = function (checkNoChanges) {
+    /**
+     * Trigger a change detection cycle for the component.
+     * @param {?=} checkNoChanges
+     * @return {?}
+     */
+    ComponentFixture.prototype.detectChanges = /**
+     * Trigger a change detection cycle for the component.
+     * @param {?=} checkNoChanges
+     * @return {?}
+     */
+    function (checkNoChanges) {
         var _this = this;
         if (checkNoChanges === void 0) { checkNoChanges = true; }
         if (this.ngZone != null) {
@@ -97,13 +126,35 @@ var ComponentFixture = /** @class */ (function () {
     /**
      * Do a change detection run to make sure there were no changes.
      */
-    ComponentFixture.prototype.checkNoChanges = function () { this.changeDetectorRef.checkNoChanges(); };
+    /**
+     * Do a change detection run to make sure there were no changes.
+     * @return {?}
+     */
+    ComponentFixture.prototype.checkNoChanges = /**
+     * Do a change detection run to make sure there were no changes.
+     * @return {?}
+     */
+    function () { this.changeDetectorRef.checkNoChanges(); };
     /**
      * Set whether the fixture should autodetect changes.
      *
      * Also runs detectChanges once so that any existing change is detected.
      */
-    ComponentFixture.prototype.autoDetectChanges = function (autoDetect) {
+    /**
+     * Set whether the fixture should autodetect changes.
+     *
+     * Also runs detectChanges once so that any existing change is detected.
+     * @param {?=} autoDetect
+     * @return {?}
+     */
+    ComponentFixture.prototype.autoDetectChanges = /**
+     * Set whether the fixture should autodetect changes.
+     *
+     * Also runs detectChanges once so that any existing change is detected.
+     * @param {?=} autoDetect
+     * @return {?}
+     */
+    function (autoDetect) {
         if (autoDetect === void 0) { autoDetect = true; }
         if (this.ngZone == null) {
             throw new Error('Cannot call autoDetectChanges when ComponentFixtureNoNgZone is set');
@@ -115,14 +166,38 @@ var ComponentFixture = /** @class */ (function () {
      * Return whether the fixture is currently stable or has async tasks that have not been completed
      * yet.
      */
-    ComponentFixture.prototype.isStable = function () { return this._isStable && !this.ngZone.hasPendingMacrotasks; };
+    /**
+     * Return whether the fixture is currently stable or has async tasks that have not been completed
+     * yet.
+     * @return {?}
+     */
+    ComponentFixture.prototype.isStable = /**
+     * Return whether the fixture is currently stable or has async tasks that have not been completed
+     * yet.
+     * @return {?}
+     */
+    function () { return this._isStable && !/** @type {?} */ ((this.ngZone)).hasPendingMacrotasks; };
     /**
      * Get a promise that resolves when the fixture is stable.
      *
      * This can be used to resume testing after events have triggered asynchronous activity or
      * asynchronous change detection.
      */
-    ComponentFixture.prototype.whenStable = function () {
+    /**
+     * Get a promise that resolves when the fixture is stable.
+     *
+     * This can be used to resume testing after events have triggered asynchronous activity or
+     * asynchronous change detection.
+     * @return {?}
+     */
+    ComponentFixture.prototype.whenStable = /**
+     * Get a promise that resolves when the fixture is stable.
+     *
+     * This can be used to resume testing after events have triggered asynchronous activity or
+     * asynchronous change detection.
+     * @return {?}
+     */
+    function () {
         var _this = this;
         if (this.isStable()) {
             return Promise.resolve(false);
@@ -135,16 +210,31 @@ var ComponentFixture = /** @class */ (function () {
             return this._promise;
         }
     };
-    ComponentFixture.prototype._getRenderer = function () {
+    /**
+     * @return {?}
+     */
+    ComponentFixture.prototype._getRenderer = /**
+     * @return {?}
+     */
+    function () {
         if (this._renderer === undefined) {
             this._renderer = this.componentRef.injector.get(RendererFactory2, null);
         }
-        return this._renderer;
+        return /** @type {?} */ (this._renderer);
     };
     /**
       * Get a promise that resolves when the ui state is stable following animations.
       */
-    ComponentFixture.prototype.whenRenderingDone = function () {
+    /**
+     * Get a promise that resolves when the ui state is stable following animations.
+     * @return {?}
+     */
+    ComponentFixture.prototype.whenRenderingDone = /**
+     * Get a promise that resolves when the ui state is stable following animations.
+     * @return {?}
+     */
+    function () {
+        /** @type {?} */
         var renderer = this._getRenderer();
         if (renderer && renderer.whenRenderingDone) {
             return renderer.whenRenderingDone();
@@ -154,7 +244,15 @@ var ComponentFixture = /** @class */ (function () {
     /**
      * Trigger component destruction.
      */
-    ComponentFixture.prototype.destroy = function () {
+    /**
+     * Trigger component destruction.
+     * @return {?}
+     */
+    ComponentFixture.prototype.destroy = /**
+     * Trigger component destruction.
+     * @return {?}
+     */
+    function () {
         if (!this._isDestroyed) {
             this.componentRef.destroy();
             if (this._onUnstableSubscription != null) {
@@ -178,7 +276,68 @@ var ComponentFixture = /** @class */ (function () {
     };
     return ComponentFixture;
 }());
+/**
+ * Fixture for debugging and testing a component.
+ *
+ *
+ * @template T
+ */
 export { ComponentFixture };
+if (false) {
+    /**
+     * The DebugElement associated with the root element of this component.
+     * @type {?}
+     */
+    ComponentFixture.prototype.debugElement;
+    /**
+     * The instance of the root component class.
+     * @type {?}
+     */
+    ComponentFixture.prototype.componentInstance;
+    /**
+     * The native element at the root of the component.
+     * @type {?}
+     */
+    ComponentFixture.prototype.nativeElement;
+    /**
+     * The ElementRef for the element at the root of the component.
+     * @type {?}
+     */
+    ComponentFixture.prototype.elementRef;
+    /**
+     * The ChangeDetectorRef for the component
+     * @type {?}
+     */
+    ComponentFixture.prototype.changeDetectorRef;
+    /** @type {?} */
+    ComponentFixture.prototype._renderer;
+    /** @type {?} */
+    ComponentFixture.prototype._isStable;
+    /** @type {?} */
+    ComponentFixture.prototype._isDestroyed;
+    /** @type {?} */
+    ComponentFixture.prototype._resolve;
+    /** @type {?} */
+    ComponentFixture.prototype._promise;
+    /** @type {?} */
+    ComponentFixture.prototype._onUnstableSubscription;
+    /** @type {?} */
+    ComponentFixture.prototype._onStableSubscription;
+    /** @type {?} */
+    ComponentFixture.prototype._onMicrotaskEmptySubscription;
+    /** @type {?} */
+    ComponentFixture.prototype._onErrorSubscription;
+    /** @type {?} */
+    ComponentFixture.prototype.componentRef;
+    /** @type {?} */
+    ComponentFixture.prototype.ngZone;
+    /** @type {?} */
+    ComponentFixture.prototype._autoDetect;
+}
+/**
+ * @param {?} fn
+ * @return {?}
+ */
 function scheduleMicroTask(fn) {
     Zone.current.scheduleMicroTask('scheduleMicrotask', fn);
 }

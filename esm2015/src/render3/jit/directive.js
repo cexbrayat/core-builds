@@ -13,8 +13,8 @@ import { ConstantPool, WrappedNodeExpr, compileComponentFromMetadata as compileR
 import { componentNeedsResolution, maybeQueueResolutionOfComponentResources } from '../../metadata/resource_loading';
 import { ViewEncapsulation } from '../../metadata/view';
 import { stringify } from '../../util';
+import { NG_COMPONENT_DEF, NG_DIRECTIVE_DEF } from '../fields';
 import { angularCoreEnv } from './environment';
-import { NG_COMPONENT_DEF, NG_DIRECTIVE_DEF } from './fields';
 import { patchComponentDefWithScope, transitiveScopesFor } from './module';
 import { getReflect, reflectDependencies } from './util';
 /** @typedef {?} */
@@ -33,7 +33,7 @@ var StringMap;
  */
 export function compileComponent(type, metadata) {
     /** @type {?} */
-    let ngComponentDef = null;
+    /** @nocollapse */ let ngComponentDef = null;
     // Metadata may have resources which need to be resolved.
     maybeQueueResolutionOfComponentResources(metadata);
     Object.defineProperty(type, NG_COMPONENT_DEF, {
@@ -63,7 +63,9 @@ export function compileComponent(type, metadata) {
                     throw new Error(`Errors during JIT compilation of template for ${stringify(type)}: ${errors}`);
                 }
                 /** @type {?} */
-                const res = compileR3Component(Object.assign({}, directiveMetadata(type, metadata), { template, directives: new Map(), pipes: new Map(), viewQueries: [], wrapDirectivesInClosure: false, styles: metadata.styles || [], encapsulation: metadata.encapsulation || ViewEncapsulation.Emulated }), constantPool, makeBindingParser());
+                const animations = metadata.animations !== null ? new WrappedNodeExpr(metadata.animations) : null;
+                /** @type {?} */
+                const res = compileR3Component(Object.assign({}, directiveMetadata(type, metadata), { template, directives: new Map(), pipes: new Map(), viewQueries: [], wrapDirectivesInClosure: false, styles: metadata.styles || [], encapsulation: metadata.encapsulation || ViewEncapsulation.Emulated, animations }), constantPool, makeBindingParser());
                 /** @type {?} */
                 const preStatements = [...constantPool.statements, ...res.statements];
                 ngComponentDef = jitExpression(res.expression, angularCoreEnv, `ng://${type.name}/ngComponentDef.js`, preStatements);
@@ -103,7 +105,7 @@ function hasSelectorScope(component) {
  */
 export function compileDirective(type, directive) {
     /** @type {?} */
-    let ngDirectiveDef = null;
+    /** @nocollapse */ let ngDirectiveDef = null;
     Object.defineProperty(type, NG_DIRECTIVE_DEF, {
         get: () => {
             if (ngDirectiveDef === null) {

@@ -10,8 +10,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { fillProperties } from '../../util/property';
+import { EMPTY, EMPTY_ARRAY } from '../definition';
 /**
- * Determines if a definition is a {\@link ComponentDefInternal} or a {\@link DirectiveDefInternal}
+ * Determines if a definition is a {\@link ComponentDef} or a {\@link DirectiveDef}
  * @template T
  * @param {?} definition The definition to examine
  * @return {?}
@@ -40,16 +41,27 @@ export function InheritDefinitionFeature(definition) {
         /** @type {?} */
         var superDef = undefined;
         if (isComponentDef(definition)) {
+            // Don't use getComponentDef/getDirectiveDef. This logic relies on inheritance.
             superDef = superType.ngComponentDef || superType.ngDirectiveDef;
         }
         else {
             if (superType.ngComponentDef) {
                 throw new Error('Directives cannot inherit Components');
             }
+            // Don't use getComponentDef/getDirectiveDef. This logic relies on inheritance.
             superDef = superType.ngDirectiveDef;
         }
-        /** @type {?} */
+        /** @nocollapse @type {?} */
         var baseDef = (/** @type {?} */ (superType)).ngBaseDef;
+        // Some fields in the definition may be empty, if there were no values to put in them that
+        // would've justified object creation. Unwrap them if necessary.
+        if (baseDef || superDef) {
+            /** @type {?} */
+            var writeableDef = /** @type {?} */ (definition);
+            writeableDef.inputs = maybeUnwrapEmpty(definition.inputs);
+            writeableDef.declaredInputs = maybeUnwrapEmpty(definition.declaredInputs);
+            writeableDef.outputs = maybeUnwrapEmpty(definition.outputs);
+        }
         if (baseDef) {
             // Merge inputs and outputs
             fillProperties(definition.inputs, baseDef.inputs);
@@ -168,6 +180,21 @@ export function InheritDefinitionFeature(definition) {
         var state_1 = _loop_1();
         if (state_1 === "break")
             break;
+    }
+}
+/**
+ * @param {?} value
+ * @return {?}
+ */
+function maybeUnwrapEmpty(value) {
+    if (value === EMPTY) {
+        return {};
+    }
+    else if (value === EMPTY_ARRAY) {
+        return [];
+    }
+    else {
+        return value;
     }
 }
 //# sourceMappingURL=inherit_definition_feature.js.map

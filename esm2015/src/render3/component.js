@@ -10,11 +10,15 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { assertComponentType, assertDefined } from './assert';
+import { getComponentViewByInstance } from './context_discovery';
+import { getComponentDef } from './definition';
 import { queueInitHooks, queueLifecycleHooks } from './hooks';
-import { CLEAN_PROMISE, _getComponentHostLElementNode, baseDirectiveCreate, createLViewData, createTView, detectChangesInternal, enterView, executeInitAndContentHooks, getRootView, hostElement, initChangeDetectorIfExisting, leaveView, locateHostElement, setHostBindings, queueHostBindingForCheck, } from './instructions';
+import { CLEAN_PROMISE, baseDirectiveCreate, createLViewData, createNodeAtIndex, createTView, detectChangesInternal, enterView, executeInitAndContentHooks, getOrCreateTView, leaveView, locateHostElement, prefillHostVars, resetComponentState, setHostBindings } from './instructions';
 import { domRendererFactory3 } from './interfaces/renderer';
-import { INJECTOR, CONTEXT, TVIEW } from './interfaces/view';
-import { stringify } from './util';
+import { CONTEXT, HEADER_OFFSET, HOST, HOST_NODE, INJECTOR, TVIEW } from './interfaces/view';
+import { getRootView, readElementValue, readPatchedLViewData, stringify } from './util';
+/** @type {?} */
+const ROOT_EXPANDO_INSTRUCTIONS = [0, 1];
 /**
  * Options that control how the component should be bootstrapped.
  * @record
@@ -30,6 +34,11 @@ CreateComponentOptions.prototype.rendererFactory;
  * @type {?|undefined}
  */
 CreateComponentOptions.prototype.sanitizer;
+/**
+ * A custom animation player handler
+ * @type {?|undefined}
+ */
+CreateComponentOptions.prototype.playerHandler;
 /**
  * Host element on which the component will be bootstrapped. If not specified,
  * the component definition's `tag` is used to query the existing DOM for the
@@ -69,6 +78,8 @@ CreateComponentOptions.prototype.hostFeatures;
  * @type {?|undefined}
  */
 CreateComponentOptions.prototype.scheduler;
+/** @typedef {?} */
+var HostFeature;
 /** @type {?} */
 export const NULL_INJECTOR = {
     get: (token, notFoundValue) => {
@@ -97,41 +108,35 @@ export function renderComponent(componentType /* Type as workaround for: Microso
     /** @type {?} */
     const sanitizer = opts.sanitizer || null;
     /** @type {?} */
-    const componentDef = /** @type {?} */ ((/** @type {?} */ (componentType)).ngComponentDef);
+    const componentDef = /** @type {?} */ ((getComponentDef(componentType)));
     if (componentDef.type != componentType)
         componentDef.type = componentType;
     /** @type {?} */
     const componentTag = /** @type {?} */ (((/** @type {?} */ ((componentDef.selectors))[0]))[0]);
     /** @type {?} */
-    const hostNode = locateHostElement(rendererFactory, opts.host || componentTag);
+    const hostRNode = locateHostElement(rendererFactory, opts.host || componentTag);
     /** @type {?} */
-    const rootContext = createRootContext(opts.scheduler || requestAnimationFrame.bind(window));
+    const rootFlags = componentDef.onPush ? 4 /* Dirty */ | 64 /* IsRoot */ :
+        2 /* CheckAlways */ | 64 /* IsRoot */;
     /** @type {?} */
-    const rootView = createLViewData(rendererFactory.createRenderer(hostNode, componentDef), createTView(-1, null, 1, 0, null, null, null), rootContext, componentDef.onPush ? 4 /* Dirty */ : 2 /* CheckAlways */);
+    const rootContext = createRootContext(opts.scheduler || requestAnimationFrame.bind(window), opts.playerHandler || null);
+    /** @type {?} */
+    const renderer = rendererFactory.createRenderer(hostRNode, componentDef);
+    /** @type {?} */
+    const rootView = createLViewData(renderer, createTView(-1, null, 1, 0, null, null, null), rootContext, rootFlags);
     rootView[INJECTOR] = opts.injector || null;
     /** @type {?} */
-    const oldView = enterView(rootView, /** @type {?} */ ((null)));
-    /** @type {?} */
-    let elementNode;
+    const oldView = enterView(rootView, null);
     /** @type {?} */
     let component;
     try {
         if (rendererFactory.begin)
             rendererFactory.begin();
-        // Create element node at index 0 in data array
-        elementNode = hostElement(componentTag, hostNode, componentDef, sanitizer);
-        // Create directive instance with factory() and store at index 0 in directives array
-        component = baseDirectiveCreate(0, /** @type {?} */ (componentDef.factory()), componentDef);
-        if (componentDef.hostBindings) {
-            queueHostBindingForCheck(0, componentDef.hostVars);
-        }
-        rootContext.components.push(component);
-        (/** @type {?} */ (elementNode.data))[CONTEXT] = component;
-        initChangeDetectorIfExisting(elementNode.nodeInjector, component, /** @type {?} */ ((elementNode.data)));
-        opts.hostFeatures && opts.hostFeatures.forEach((feature) => feature(component, componentDef));
+        /** @type {?} */
+        const componentView = createRootComponentView(hostRNode, componentDef, rootView, renderer, sanitizer);
+        component = createRootComponent(hostRNode, componentView, componentDef, rootView, rootContext, opts.hostFeatures || null);
         executeInitAndContentHooks();
-        setHostBindings(rootView[TVIEW].hostBindings);
-        detectChangesInternal(/** @type {?} */ (elementNode.data), elementNode, component);
+        detectChangesInternal(componentView, component);
     }
     finally {
         leaveView(oldView);
@@ -141,14 +146,71 @@ export function renderComponent(componentType /* Type as workaround for: Microso
     return component;
 }
 /**
- * @param {?} scheduler
+ * Creates the root component view and the root component node.
+ *
+ * @param {?} rNode Render host element.
+ * @param {?} def ComponentDef
+ * @param {?} rootView The parent view where the host node is stored
+ * @param {?} renderer The current renderer
+ * @param {?=} sanitizer The sanitizer, if provided
+ *
+ * @return {?} Component view created
+ */
+export function createRootComponentView(rNode, def, rootView, renderer, sanitizer) {
+    resetComponentState();
+    /** @type {?} */
+    const tView = rootView[TVIEW];
+    /** @type {?} */
+    const componentView = createLViewData(renderer, getOrCreateTView(def.template, def.consts, def.vars, def.directiveDefs, def.pipeDefs, def.viewQuery), null, def.onPush ? 4 /* Dirty */ : 2 /* CheckAlways */, sanitizer);
+    /** @type {?} */
+    const tNode = createNodeAtIndex(0, 3 /* Element */, rNode, null, null);
+    if (tView.firstTemplatePass) {
+        tView.expandoInstructions = ROOT_EXPANDO_INSTRUCTIONS.slice();
+        if (def.diPublic)
+            def.diPublic(def);
+        tNode.flags =
+            rootView.length << 15 /* DirectiveStartingIndexShift */ | 4096 /* isComponent */;
+    }
+    // Store component view at node index, with node as the HOST
+    componentView[HOST] = rootView[HEADER_OFFSET];
+    componentView[HOST_NODE] = /** @type {?} */ (tNode);
+    return rootView[HEADER_OFFSET] = componentView;
+}
+/**
+ * Creates a root component and sets it up with features and host bindings. Shared by
+ * renderComponent() and ViewContainerRef.createComponent().
+ * @template T
+ * @param {?} hostRNode
+ * @param {?} componentView
+ * @param {?} componentDef
+ * @param {?} rootView
+ * @param {?} rootContext
+ * @param {?} hostFeatures
  * @return {?}
  */
-export function createRootContext(scheduler) {
+export function createRootComponent(hostRNode, componentView, componentDef, rootView, rootContext, hostFeatures) {
+    /** @type {?} */
+    const component = baseDirectiveCreate(rootView.length, /** @type {?} */ (componentDef.factory()), componentDef, hostRNode);
+    rootContext.components.push(component);
+    componentView[CONTEXT] = component;
+    hostFeatures && hostFeatures.forEach((feature) => feature(component, componentDef));
+    if (rootView[TVIEW].firstTemplatePass)
+        prefillHostVars(componentDef.hostVars);
+    setHostBindings();
+    return component;
+}
+/**
+ * @param {?} scheduler
+ * @param {?=} playerHandler
+ * @return {?}
+ */
+export function createRootContext(scheduler, playerHandler) {
     return {
         components: [],
         scheduler: scheduler,
         clean: CLEAN_PROMISE,
+        playerHandler: playerHandler || null,
+        flags: 0 /* Empty */
     };
 }
 /**
@@ -169,11 +231,11 @@ export function createRootContext(scheduler) {
  */
 export function LifecycleHooksFeature(component, def) {
     /** @type {?} */
-    const elementNode = _getComponentHostLElementNode(component);
+    const rootTView = /** @type {?} */ ((readPatchedLViewData(component)))[TVIEW];
     /** @type {?} */
-    const tView = elementNode.view[TVIEW];
-    queueInitHooks(0, def.onInit, def.doCheck, tView);
-    queueLifecycleHooks(elementNode.tNode.flags, tView);
+    const dirIndex = rootTView.data.length - 1;
+    queueInitHooks(dirIndex, def.onInit, def.doCheck, rootTView);
+    queueLifecycleHooks(dirIndex << 15 /* DirectiveStartingIndexShift */ | 1, rootTView);
 }
 /**
  * Retrieve the root context for any component by walking the parent `LView` until
@@ -199,7 +261,7 @@ function getRootContext(component) {
  * @return {?}
  */
 export function getHostElement(component) {
-    return /** @type {?} */ (_getComponentHostLElementNode(component).native);
+    return /** @type {?} */ (readElementValue(getComponentViewByInstance(component)));
 }
 /**
  * Retrieves the rendered text for a given component.

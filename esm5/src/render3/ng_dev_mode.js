@@ -9,15 +9,12 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/** @type {?} */
-var __global = typeof window != 'undefined' && window || typeof global != 'undefined' && global ||
-    typeof self != 'undefined' && self;
 /**
  * @return {?}
  */
 export function ngDevModeResetPerfCounters() {
-    // Make sure to refer to ngDevMode as ['ngDevMode'] for clousre.
-    return __global['ngDevMode'] = {
+    /** @type {?} */
+    var newCounters = {
         firstTemplatePass: 0,
         tNode: 0,
         tView: 0,
@@ -39,6 +36,21 @@ export function ngDevModeResetPerfCounters() {
         rendererRemoveNode: 0,
         rendererCreateComment: 0,
     };
+    // NOTE: Under Ivy we may have both window & global defined in the Node
+    //    environment since ensureDocument() in render3.ts sets global.window.
+    if (typeof window != 'undefined') {
+        // Make sure to refer to ngDevMode as ['ngDevMode'] for closure.
+        (/** @type {?} */ (window))['ngDevMode'] = newCounters;
+    }
+    if (typeof global != 'undefined') {
+        // Make sure to refer to ngDevMode as ['ngDevMode'] for closure.
+        (/** @type {?} */ (global))['ngDevMode'] = newCounters;
+    }
+    if (typeof self != 'undefined') {
+        // Make sure to refer to ngDevMode as ['ngDevMode'] for closure.
+        (/** @type {?} */ (self))['ngDevMode'] = newCounters;
+    }
+    return newCounters;
 }
 /**
  * This checks to see if the `ngDevMode` has been set. If yes,
@@ -49,7 +61,6 @@ export function ngDevModeResetPerfCounters() {
  * as much early warning and errors as possible.
  */
 if (typeof ngDevMode === 'undefined' || ngDevMode) {
-    // Make sure to refer to ngDevMode as ['ngDevMode'] for clousre.
-    __global['ngDevMode'] = ngDevModeResetPerfCounters();
+    ngDevModeResetPerfCounters();
 }
 //# sourceMappingURL=ng_dev_mode.js.map

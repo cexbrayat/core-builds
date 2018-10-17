@@ -10,21 +10,17 @@
  * found in the LICENSE file at https://angular.io/license
  */
 /**
- * Represents an instance of a Component created via a {\@link ComponentFactory}.
- *
- * `ComponentRef` provides access to the Component Instance as well other objects related to this
- * Component Instance and allows you to destroy the Component Instance via the {\@link #destroy}
- * method.
+ * Represents a component created by a `ComponentFactory`.
+ * Provides access to the component instance and related objects,
+ * and provides the means of destroying the instance.
  *
  * @abstract
  * @template C
  */
 var /**
- * Represents an instance of a Component created via a {\@link ComponentFactory}.
- *
- * `ComponentRef` provides access to the Component Instance as well other objects related to this
- * Component Instance and allows you to destroy the Component Instance via the {\@link #destroy}
- * method.
+ * Represents a component created by a `ComponentFactory`.
+ * Provides access to the component instance and related objects,
+ * and provides the means of destroying the instance.
  *
  * @abstract
  * @template C
@@ -35,11 +31,9 @@ ComponentRef = /** @class */ (function () {
     return ComponentRef;
 }());
 /**
- * Represents an instance of a Component created via a {\@link ComponentFactory}.
- *
- * `ComponentRef` provides access to the Component Instance as well other objects related to this
- * Component Instance and allows you to destroy the Component Instance via the {\@link #destroy}
- * method.
+ * Represents a component created by a `ComponentFactory`.
+ * Provides access to the component instance and related objects,
+ * and provides the means of destroying the instance.
  *
  * @abstract
  * @template C
@@ -47,31 +41,32 @@ ComponentRef = /** @class */ (function () {
 export { ComponentRef };
 if (false) {
     /**
-     * Location of the Host Element of this Component Instance.
+     * The host or anchor [element](guide/glossary#element) for this component instance.
      * @abstract
      * @return {?}
      */
     ComponentRef.prototype.location = function () { };
     /**
-     * The injector on which the component instance exists.
+     * The [dependency injector](guide/glossary#injector) for this component instance.
      * @abstract
      * @return {?}
      */
     ComponentRef.prototype.injector = function () { };
     /**
-     * The instance of the Component.
+     * This component instance.
      * @abstract
      * @return {?}
      */
     ComponentRef.prototype.instance = function () { };
     /**
-     * The {\@link ViewRef} of the Host View of this Component instance.
+     * The [host view](guide/glossary#view-tree) defined by the template
+     * for this component instance.
      * @abstract
      * @return {?}
      */
     ComponentRef.prototype.hostView = function () { };
     /**
-     * The {\@link ChangeDetectorRef} of the Component instance.
+     * The change detector for this component instance.
      * @abstract
      * @return {?}
      */
@@ -89,9 +84,11 @@ if (false) {
      */
     ComponentRef.prototype.destroy = function () { };
     /**
-     * Allows to register a callback that will be called when the component is destroyed.
+     * A lifecycle hook that provides additional developer-defined cleanup
+     * functionality for the component.
      * @abstract
-     * @param {?} callback
+     * @param {?} callback A handler function that cleans up developer-defined data
+     * associated with this component. Called when the `destroy()` method is invoked.
      * @return {?}
      */
     ComponentRef.prototype.onDestroy = function (callback) { };
@@ -116,29 +113,31 @@ ComponentFactory = /** @class */ (function () {
 export { ComponentFactory };
 if (false) {
     /**
+     * The comonent's HTML selector.
      * @abstract
      * @return {?}
      */
     ComponentFactory.prototype.selector = function () { };
     /**
+     * The component's type
      * @abstract
      * @return {?}
      */
     ComponentFactory.prototype.componentType = function () { };
     /**
-     * selector for all <ng-content> elements in the component.
+     * Selector for all <ng-content> elements in the component.
      * @abstract
      * @return {?}
      */
     ComponentFactory.prototype.ngContentSelectors = function () { };
     /**
-     * the inputs of the component.
+     * The inputs of the component.
      * @abstract
      * @return {?}
      */
     ComponentFactory.prototype.inputs = function () { };
     /**
-     * the outputs of the component.
+     * The outputs of the component.
      * @abstract
      * @return {?}
      */

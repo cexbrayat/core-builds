@@ -10,9 +10,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { WrappedNodeExpr, compilePipeFromMetadata, jitExpression } from '@angular/compiler';
+import { NG_PIPE_DEF } from '../fields';
 import { stringify } from '../util';
 import { angularCoreEnv } from './environment';
-import { NG_PIPE_DEF } from './fields';
 import { reflectDependencies } from './util';
 /**
  * @param {?} type
@@ -21,7 +21,7 @@ import { reflectDependencies } from './util';
  */
 export function compilePipe(type, meta) {
     /** @type {?} */
-    var ngPipeDef = null;
+    /** @nocollapse */ var ngPipeDef = null;
     Object.defineProperty(type, NG_PIPE_DEF, {
         get: function () {
             if (ngPipeDef === null) {

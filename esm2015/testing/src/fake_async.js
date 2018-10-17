@@ -1,18 +1,18 @@
 /**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
 import { discardPeriodicTasksFallback, fakeAsyncFallback, flushFallback, flushMicrotasksFallback, resetFakeAsyncZoneFallback, tickFallback } from './fake_async_fallback';
+/** @type {?} */
 const _Zone = typeof Zone !== 'undefined' ? Zone : null;
+/** @type {?} */
 const fakeAsyncTestModule = _Zone && _Zone[_Zone.__symbol__('fakeAsyncTest')];
 /**
  * Clears out the shared fake async zone for a test.
  * To be called in a global `beforeEach`.
  *
- * @experimental
+ * \@experimental
+ * @return {?}
  */
 export function resetFakeAsyncZone() {
     if (fakeAsyncTestModule) {
@@ -31,15 +31,15 @@ export function resetFakeAsyncZone() {
  *
  * Can be used to wrap inject() calls.
  *
- * @usageNotes
+ * \@usageNotes
  * ### Example
  *
- * {@example core/testing/ts/fake_async.ts region='basic'}
+ * {\@example core/testing/ts/fake_async.ts region='basic'}
  *
- * @param fn
- * @returns The function wrapped to be executed in the fakeAsync zone
+ * \@experimental
+ * @param {?} fn
+ * @return {?} The function wrapped to be executed in the fakeAsync zone
  *
- * @experimental
  */
 export function fakeAsync(fn) {
     if (fakeAsyncTestModule) {
@@ -55,12 +55,14 @@ export function fakeAsync(fn) {
  * The microtasks queue is drained at the very start of this function and after any timer callback
  * has been executed.
  *
- * @usageNotes
+ * \@usageNotes
  * ### Example
  *
- * {@example core/testing/ts/fake_async.ts region='basic'}
+ * {\@example core/testing/ts/fake_async.ts region='basic'}
  *
- * @experimental
+ * \@experimental
+ * @param {?=} millis
+ * @return {?}
  */
 export function tick(millis = 0) {
     if (fakeAsyncTestModule) {
@@ -75,10 +77,10 @@ export function tick(millis = 0) {
  * draining the macrotask queue until it is empty. The returned value is the milliseconds
  * of time that would have been elapsed.
  *
- * @param maxTurns
- * @returns The simulated time elapsed, in millis.
+ * \@experimental
+ * @param {?=} maxTurns
+ * @return {?} The simulated time elapsed, in millis.
  *
- * @experimental
  */
 export function flush(maxTurns) {
     if (fakeAsyncTestModule) {
@@ -91,7 +93,8 @@ export function flush(maxTurns) {
 /**
  * Discard all remaining periodic tasks.
  *
- * @experimental
+ * \@experimental
+ * @return {?}
  */
 export function discardPeriodicTasks() {
     if (fakeAsyncTestModule) {
@@ -104,7 +107,8 @@ export function discardPeriodicTasks() {
 /**
  * Flush any pending microtasks.
  *
- * @experimental
+ * \@experimental
+ * @return {?}
  */
 export function flushMicrotasks() {
     if (fakeAsyncTestModule) {

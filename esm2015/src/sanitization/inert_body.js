@@ -154,7 +154,7 @@ export class InertBodyHelper {
             }
         }
         /** @type {?} */
-        let childNode = el.firstChild;
+        let childNode = /** @type {?} */ (el.firstChild);
         while (childNode) {
             if (childNode.nodeType === Node.ELEMENT_NODE)
                 this.stripCustomNsAttrs(/** @type {?} */ (childNode));

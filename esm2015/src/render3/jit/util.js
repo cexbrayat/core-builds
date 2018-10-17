@@ -12,9 +12,6 @@
 import { LiteralExpr, R3ResolvedDependencyType, WrappedNodeExpr } from '@angular/compiler';
 import { Injector } from '../../di/injector';
 import { Host, Inject, Optional, Self, SkipSelf } from '../../di/metadata';
-import { ElementRef } from '../../linker/element_ref';
-import { TemplateRef } from '../../linker/template_ref';
-import { ViewContainerRef } from '../../linker/view_container_ref';
 import { Attribute } from '../../metadata/di';
 import { ReflectionCapabilities } from '../../reflection/reflection_capabilities';
 /** @type {?} */
@@ -58,17 +55,8 @@ function reflectDependency(dep) {
      * @return {?}
      */
     function setTokenAndResolvedType(token) {
-        if (token === ElementRef) {
-            meta.resolved = R3ResolvedDependencyType.ElementRef;
-        }
-        else if (token === Injector) {
+        if (token === Injector) {
             meta.resolved = R3ResolvedDependencyType.Injector;
-        }
-        else if (token === TemplateRef) {
-            meta.resolved = R3ResolvedDependencyType.TemplateRef;
-        }
-        else if (token === ViewContainerRef) {
-            meta.resolved = R3ResolvedDependencyType.ViewContainerRef;
         }
         else {
             meta.resolved = R3ResolvedDependencyType.Token;

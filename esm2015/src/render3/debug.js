@@ -9,11 +9,9 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { Injector } from '../di/injector';
 import { DebugRendererFactory2 } from '../view/services';
-import * as di from './di';
-import { NG_HOST_SYMBOL, _getViewData } from './instructions';
-import { CONTEXT, DIRECTIVES, TVIEW } from './interfaces/view';
+import { getHostComponent, getInjector, getLocalRefs, loadContext } from './discovery_utils';
+import { TVIEW } from './interfaces/view';
 /**
  * Adapts the DebugRendererFactory2 to create a DebugRenderer2 specific for IVY.
  *
@@ -28,7 +26,7 @@ export class Render3DebugRendererFactory2 extends DebugRendererFactory2 {
     createRenderer(element, renderData) {
         /** @type {?} */
         const renderer = /** @type {?} */ (super.createRenderer(element, renderData));
-        renderer.debugContextFactory = () => new Render3DebugContext(_getViewData());
+        renderer.debugContextFactory = (nativeElement) => new Render3DebugContext(nativeElement);
         return renderer;
     }
 }
@@ -39,91 +37,60 @@ export class Render3DebugRendererFactory2 extends DebugRendererFactory2 {
  */
 class Render3DebugContext {
     /**
-     * @param {?} viewData
+     * @param {?} _nativeNode
      */
-    constructor(viewData) {
-        this.viewData = viewData;
-        // The LNode will be created next and appended to viewData
-        this.nodeIndex = viewData ? viewData.length : null;
+    constructor(_nativeNode) {
+        this._nativeNode = _nativeNode;
     }
     /**
      * @return {?}
      */
-    get view() { return this.viewData; }
+    get nodeIndex() { return loadContext(this._nativeNode).nodeIndex; }
     /**
      * @return {?}
      */
-    get injector() {
-        if (this.nodeIndex !== null) {
-            /** @type {?} */
-            const lElementNode = this.view[this.nodeIndex];
-            /** @type {?} */
-            const nodeInjector = lElementNode.nodeInjector;
-            if (nodeInjector) {
-                return new di.NodeInjector(nodeInjector);
-            }
-        }
-        return Injector.NULL;
-    }
+    get view() { return loadContext(this._nativeNode).lViewData; }
     /**
      * @return {?}
      */
-    get component() {
-        // TODO(vicb): why/when
-        if (this.nodeIndex === null) {
-            return null;
-        }
-        /** @type {?} */
-        const tView = this.view[TVIEW];
-        /** @type {?} */
-        const components = tView.components;
-        return (components && components.indexOf(this.nodeIndex) == -1) ?
-            null :
-            this.view[this.nodeIndex].data[CONTEXT];
-    }
+    get injector() { return getInjector(this._nativeNode); }
+    /**
+     * @return {?}
+     */
+    get component() { return getHostComponent(this._nativeNode); }
     /**
      * @return {?}
      */
     get providerTokens() {
         /** @type {?} */
-        const matchedDirectives = [];
-        // TODO(vicb): why/when
-        if (this.nodeIndex === null) {
-            return matchedDirectives;
-        }
+        const lDebugCtx = loadContext(this._nativeNode);
         /** @type {?} */
-        const directives = this.view[DIRECTIVES];
-        if (directives) {
+        const lViewData = lDebugCtx.lViewData;
+        /** @type {?} */
+        const tNode = /** @type {?} */ (lViewData[TVIEW].data[lDebugCtx.nodeIndex]);
+        /** @type {?} */
+        const directivesCount = tNode.flags & 4095 /* DirectiveCountMask */;
+        if (directivesCount > 0) {
             /** @type {?} */
-            const currentNode = this.view[this.nodeIndex];
-            for (let dirIndex = 0; dirIndex < directives.length; dirIndex++) {
-                /** @type {?} */
-                const directive = directives[dirIndex];
-                if (directive[NG_HOST_SYMBOL] === currentNode) {
-                    matchedDirectives.push(directive.constructor);
-                }
-            }
+            const directiveIdxStart = tNode.flags >> 15 /* DirectiveStartingIndexShift */;
+            /** @type {?} */
+            const directiveIdxEnd = directiveIdxStart + directivesCount;
+            /** @type {?} */
+            const viewDirectiveDefs = this.view[TVIEW].data;
+            /** @type {?} */
+            const directiveDefs = /** @type {?} */ (viewDirectiveDefs.slice(directiveIdxStart, directiveIdxEnd));
+            return directiveDefs.map(directiveDef => directiveDef.type);
         }
-        return matchedDirectives;
+        return [];
     }
     /**
      * @return {?}
      */
-    get references() {
-        // TODO(vicb): implement retrieving references
-        throw new Error('Not implemented yet in ivy');
-    }
+    get references() { return getLocalRefs(this._nativeNode); }
     /**
      * @return {?}
      */
-    get context() {
-        if (this.nodeIndex === null) {
-            return null;
-        }
-        /** @type {?} */
-        const lNode = this.view[this.nodeIndex];
-        return lNode.view[CONTEXT];
-    }
+    get context() { throw new Error('Not implemented in ivy'); }
     /**
      * @return {?}
      */
@@ -141,8 +108,6 @@ class Render3DebugContext {
 }
 if (false) {
     /** @type {?} */
-    Render3DebugContext.prototype.nodeIndex;
-    /** @type {?} */
-    Render3DebugContext.prototype.viewData;
+    Render3DebugContext.prototype._nativeNode;
 }
 //# sourceMappingURL=debug.js.map

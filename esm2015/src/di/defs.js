@@ -9,6 +9,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { NG_INJECTABLE_DEF, NG_INJECTOR_DEF } from '../render3/fields';
 /**
  * Information about how a type or `InjectionToken` interfaces with the DI system.
  *
@@ -159,5 +160,25 @@ export function defineInjector(options) {
     return /** @type {?} */ ((/** @type {?} */ ({
         factory: options.factory, providers: options.providers || [], imports: options.imports || [],
     })));
+}
+/**
+ * Read the `ngInjectableDef` type in a way which is immune to accidentally reading inherited value.
+ *
+ * @template T
+ * @param {?} type type which may have `ngInjectableDef`
+ * @return {?}
+ */
+export function getInjectableDef(type) {
+    return type.hasOwnProperty(NG_INJECTABLE_DEF) ? (/** @type {?} */ (type))[NG_INJECTABLE_DEF] : null;
+}
+/**
+ * Read the `ngInjectorDef` type in a way which is immune to accidentally reading inherited value.
+ *
+ * @template T
+ * @param {?} type type which may have `ngInjectorDef`
+ * @return {?}
+ */
+export function getInjectorDef(type) {
+    return type.hasOwnProperty(NG_INJECTOR_DEF) ? (/** @type {?} */ (type))[NG_INJECTOR_DEF] : null;
 }
 //# sourceMappingURL=defs.js.map

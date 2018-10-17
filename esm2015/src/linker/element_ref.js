@@ -9,6 +9,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { R3_ELEMENT_REF_FACTORY } from '../ivy_switch/runtime/index';
 /**
  * A wrapper around a native element inside of a View.
  *
@@ -28,7 +29,16 @@ export class ElementRef {
      */
     constructor(nativeElement) { this.nativeElement = nativeElement; }
 }
+/**
+ * \@internal
+ */
+ElementRef.__NG_ELEMENT_ID__ = () => R3_ELEMENT_REF_FACTORY(ElementRef);
 if (false) {
+    /**
+     * \@internal
+     * @type {?}
+     */
+    ElementRef.__NG_ELEMENT_ID__;
     /**
      * The underlying native element or `null` if direct access to native elements is not supported
      * (e.g. when the application runs in a web worker).

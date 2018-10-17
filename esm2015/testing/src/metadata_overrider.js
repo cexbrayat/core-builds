@@ -1,4 +1,8 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -6,6 +10,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ɵstringify as stringify } from '@angular/core';
+/** @typedef {?} */
+var StringMap;
+/** @type {?} */
 let _nextReferenceId = 0;
 export class MetadataOverrider {
     constructor() {
@@ -14,11 +21,17 @@ export class MetadataOverrider {
     /**
      * Creates a new instance for the given metadata class
      * based on an old instance and overrides.
+     * @template C, T
+     * @param {?} metadataClass
+     * @param {?} oldMetadata
+     * @param {?} override
+     * @return {?}
      */
     overrideMetadata(metadataClass, oldMetadata, override) {
+        /** @type {?} */
         const props = {};
         if (oldMetadata) {
-            _valueProps(oldMetadata).forEach((prop) => props[prop] = oldMetadata[prop]);
+            _valueProps(oldMetadata).forEach((prop) => props[prop] = (/** @type {?} */ (oldMetadata))[prop]);
         }
         if (override.set) {
             if (override.remove || override.add) {
@@ -32,12 +45,24 @@ export class MetadataOverrider {
         if (override.add) {
             addMetadata(props, override.add);
         }
-        return new metadataClass(props);
+        return new metadataClass(/** @type {?} */ (props));
     }
 }
+if (false) {
+    /** @type {?} */
+    MetadataOverrider.prototype._references;
+}
+/**
+ * @param {?} metadata
+ * @param {?} remove
+ * @param {?} references
+ * @return {?}
+ */
 function removeMetadata(metadata, remove, references) {
+    /** @type {?} */
     const removeObjects = new Set();
     for (const prop in remove) {
+        /** @type {?} */
         const removeValue = remove[prop];
         if (removeValue instanceof Array) {
             removeValue.forEach((value) => { removeObjects.add(_propHashKey(prop, value, references)); });
@@ -47,6 +72,7 @@ function removeMetadata(metadata, remove, references) {
         }
     }
     for (const prop in metadata) {
+        /** @type {?} */
         const propValue = metadata[prop];
         if (propValue instanceof Array) {
             metadata[prop] = propValue.filter((value) => !removeObjects.has(_propHashKey(prop, value, references)));
@@ -58,9 +84,16 @@ function removeMetadata(metadata, remove, references) {
         }
     }
 }
+/**
+ * @param {?} metadata
+ * @param {?} add
+ * @return {?}
+ */
 function addMetadata(metadata, add) {
     for (const prop in add) {
+        /** @type {?} */
         const addValue = add[prop];
+        /** @type {?} */
         const propValue = metadata[prop];
         if (propValue != null && propValue instanceof Array) {
             metadata[prop] = propValue.concat(addValue);
@@ -70,12 +103,24 @@ function addMetadata(metadata, add) {
         }
     }
 }
+/**
+ * @param {?} metadata
+ * @param {?} set
+ * @return {?}
+ */
 function setMetadata(metadata, set) {
     for (const prop in set) {
         metadata[prop] = set[prop];
     }
 }
+/**
+ * @param {?} propName
+ * @param {?} propValue
+ * @param {?} references
+ * @return {?}
+ */
 function _propHashKey(propName, propValue, references) {
+    /** @type {?} */
     const replacer = (key, value) => {
         if (typeof value === 'function') {
             value = _serializeReference(value, references);
@@ -84,7 +129,13 @@ function _propHashKey(propName, propValue, references) {
     };
     return `${propName}:${JSON.stringify(propValue, replacer)}`;
 }
+/**
+ * @param {?} ref
+ * @param {?} references
+ * @return {?}
+ */
 function _serializeReference(ref, references) {
+    /** @type {?} */
     let id = references.get(ref);
     if (!id) {
         id = `${stringify(ref)}${_nextReferenceId++}`;
@@ -92,7 +143,12 @@ function _serializeReference(ref, references) {
     }
     return id;
 }
+/**
+ * @param {?} obj
+ * @return {?}
+ */
 function _valueProps(obj) {
+    /** @type {?} */
     const props = [];
     // regular public props
     Object.keys(obj).forEach((prop) => {
@@ -100,10 +156,11 @@ function _valueProps(obj) {
             props.push(prop);
         }
     });
-    // getters
+    /** @type {?} */
     let proto = obj;
     while (proto = Object.getPrototypeOf(proto)) {
         Object.keys(proto).forEach((protoProp) => {
+            /** @type {?} */
             const desc = Object.getOwnPropertyDescriptor(proto, protoProp);
             if (!protoProp.startsWith('_') && desc && 'get' in desc) {
                 props.push(protoProp);

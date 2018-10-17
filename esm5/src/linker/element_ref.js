@@ -9,6 +9,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { R3_ELEMENT_REF_FACTORY } from '../ivy_switch/runtime/index';
 /**
  * A wrapper around a native element inside of a View.
  *
@@ -22,40 +23,23 @@
  *
  * @template T
  */
-var /**
- * A wrapper around a native element inside of a View.
- *
- * An `ElementRef` is backed by a render-specific element. In the browser, this is usually a DOM
- * element.
- *
- * \@security Permitting direct access to the DOM can make your application more vulnerable to
- * XSS attacks. Carefully review any use of `ElementRef` in your code. For more detail, see the
- * [Security Guide](http://g.co/ng/security).
- *
- *
- * @template T
- */
-ElementRef = /** @class */ (function () {
+var ElementRef = /** @class */ (function () {
     function ElementRef(nativeElement) {
         this.nativeElement = nativeElement;
     }
+    /**
+     * \@internal
+     */
+    ElementRef.__NG_ELEMENT_ID__ = function () { return R3_ELEMENT_REF_FACTORY(ElementRef); };
     return ElementRef;
 }());
-/**
- * A wrapper around a native element inside of a View.
- *
- * An `ElementRef` is backed by a render-specific element. In the browser, this is usually a DOM
- * element.
- *
- * \@security Permitting direct access to the DOM can make your application more vulnerable to
- * XSS attacks. Carefully review any use of `ElementRef` in your code. For more detail, see the
- * [Security Guide](http://g.co/ng/security).
- *
- *
- * @template T
- */
 export { ElementRef };
 if (false) {
+    /**
+     * \@internal
+     * @type {?}
+     */
+    ElementRef.__NG_ELEMENT_ID__;
     /**
      * The underlying native element or `null` if direct access to native elements is not supported
      * (e.g. when the application runs in a web worker).

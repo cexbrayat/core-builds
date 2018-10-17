@@ -1,4 +1,8 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -10,12 +14,12 @@
  * @description
  * Entry point for all public APIs of the core/testing package.
  */
-export * from './async';
-export * from './component_fixture';
-export * from './fake_async';
+export { async } from './async';
+export { ComponentFixture } from './component_fixture';
+export { resetFakeAsyncZone, fakeAsync, tick, flush, discardPeriodicTasks, flushMicrotasks } from './fake_async';
 export { TestBed, getTestBed, inject, InjectSetupWrapper, withModule } from './test_bed';
-export * from './test_bed_common';
-export * from './before_each';
+export { TestComponentRenderer, ComponentFixtureAutoDetect, ComponentFixtureNoNgZone } from './test_bed_common';
+export { __core_private_testing_placeholder__ } from './before_each';
 export { MetadataOverrider as ɵMetadataOverrider } from './metadata_overrider';
-export * from './private_export_testing';
+export { ɵTestingCompiler, ɵTestingCompilerFactory } from './private_export_testing';
 //# sourceMappingURL=testing.js.map

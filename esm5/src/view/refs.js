@@ -937,13 +937,13 @@ var RendererAdapter = /** @class */ (function () {
     /**
      * @param {?} renderElement
      * @param {?} namespaceAndName
-     * @param {?} attributeValue
+     * @param {?=} attributeValue
      * @return {?}
      */
     RendererAdapter.prototype.setElementAttribute = /**
      * @param {?} renderElement
      * @param {?} namespaceAndName
-     * @param {?} attributeValue
+     * @param {?=} attributeValue
      * @return {?}
      */
     function (renderElement, namespaceAndName, attributeValue) {
@@ -991,13 +991,13 @@ var RendererAdapter = /** @class */ (function () {
     /**
      * @param {?} renderElement
      * @param {?} styleName
-     * @param {?} styleValue
+     * @param {?=} styleValue
      * @return {?}
      */
     RendererAdapter.prototype.setElementStyle = /**
      * @param {?} renderElement
      * @param {?} styleName
-     * @param {?} styleValue
+     * @param {?=} styleValue
      * @return {?}
      */
     function (renderElement, styleName, styleValue) {

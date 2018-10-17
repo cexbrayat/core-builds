@@ -1,29 +1,38 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-/**
+/** *
  * fakeAsync has been moved to zone.js
  * this file is for fallback in case old version of zone.js is used
- */
+  @type {?} */
 const _Zone = typeof Zone !== 'undefined' ? Zone : null;
+/** @type {?} */
 const FakeAsyncTestZoneSpec = _Zone && _Zone['FakeAsyncTestZoneSpec'];
+/** @type {?} */
 const ProxyZoneSpec = _Zone && _Zone['ProxyZoneSpec'];
+/** @type {?} */
 let _fakeAsyncTestZoneSpec = null;
 /**
  * Clears out the shared fake async zone for a test.
  * To be called in a global `beforeEach`.
  *
- * @experimental
+ * \@experimental
+ * @return {?}
  */
 export function resetFakeAsyncZoneFallback() {
     _fakeAsyncTestZoneSpec = null;
     // in node.js testing we may not have ProxyZoneSpec in which case there is nothing to reset.
     ProxyZoneSpec && ProxyZoneSpec.assertPresent().resetDelegate();
 }
+/** @type {?} */
 let _inFakeAsyncCall = false;
 /**
  * Wraps a function to be executed in the fakeAsync zone:
@@ -34,19 +43,20 @@ let _inFakeAsyncCall = false;
  *
  * Can be used to wrap inject() calls.
  *
- * @usageNotes
+ * \@usageNotes
  * ### Example
  *
- * {@example core/testing/ts/fake_async.ts region='basic'}
+ * {\@example core/testing/ts/fake_async.ts region='basic'}
  *
- * @param fn
- * @returns The function wrapped to be executed in the fakeAsync zone
+ * \@experimental
+ * @param {?} fn
+ * @return {?} The function wrapped to be executed in the fakeAsync zone
  *
- * @experimental
  */
 export function fakeAsyncFallback(fn) {
     // Not using an arrow function to preserve context passed from call site
     return function (...args) {
+        /** @type {?} */
         const proxyZoneSpec = ProxyZoneSpec.assertPresent();
         if (_inFakeAsyncCall) {
             throw new Error('fakeAsync() calls can not be nested');
@@ -59,7 +69,9 @@ export function fakeAsyncFallback(fn) {
                 }
                 _fakeAsyncTestZoneSpec = new FakeAsyncTestZoneSpec();
             }
+            /** @type {?} */
             let res;
+            /** @type {?} */
             const lastProxyZoneSpec = proxyZoneSpec.getDelegate();
             proxyZoneSpec.setDelegate(_fakeAsyncTestZoneSpec);
             try {
@@ -84,6 +96,9 @@ export function fakeAsyncFallback(fn) {
         }
     };
 }
+/**
+ * @return {?}
+ */
 function _getFakeAsyncZoneSpec() {
     if (_fakeAsyncTestZoneSpec == null) {
         throw new Error('The code should be running in the fakeAsync zone to call this function');
@@ -96,12 +111,14 @@ function _getFakeAsyncZoneSpec() {
  * The microtasks queue is drained at the very start of this function and after any timer callback
  * has been executed.
  *
- * @usageNotes
+ * \@usageNotes
  * ### Example
  *
- * {@example core/testing/ts/fake_async.ts region='basic'}
+ * {\@example core/testing/ts/fake_async.ts region='basic'}
  *
- * @experimental
+ * \@experimental
+ * @param {?=} millis
+ * @return {?}
  */
 export function tickFallback(millis = 0) {
     _getFakeAsyncZoneSpec().tick(millis);
@@ -111,10 +128,10 @@ export function tickFallback(millis = 0) {
  * draining the macrotask queue until it is empty. The returned value is the milliseconds
  * of time that would have been elapsed.
  *
- * @param maxTurns
- * @returns The simulated time elapsed, in millis.
+ * \@experimental
+ * @param {?=} maxTurns
+ * @return {?} The simulated time elapsed, in millis.
  *
- * @experimental
  */
 export function flushFallback(maxTurns) {
     return _getFakeAsyncZoneSpec().flush(maxTurns);
@@ -122,16 +139,19 @@ export function flushFallback(maxTurns) {
 /**
  * Discard all remaining periodic tasks.
  *
- * @experimental
+ * \@experimental
+ * @return {?}
  */
 export function discardPeriodicTasksFallback() {
+    /** @type {?} */
     const zoneSpec = _getFakeAsyncZoneSpec();
     zoneSpec.pendingPeriodicTimers.length = 0;
 }
 /**
  * Flush any pending microtasks.
  *
- * @experimental
+ * \@experimental
+ * @return {?}
  */
 export function flushMicrotasksFallback() {
     _getFakeAsyncZoneSpec().flushMicrotasks();

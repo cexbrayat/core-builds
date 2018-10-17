@@ -10,16 +10,19 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { EventEmitter } from '../event_emitter';
+import { ElementRef as ViewEngine_ElementRef } from '../linker/element_ref';
+import { TemplateRef as ViewEngine_TemplateRef } from '../linker/template_ref';
 import { getSymbolIterator } from '../util';
 import { assertDefined, assertEqual } from './assert';
-import { ReadFromInjectorFn, getOrCreateNodeInjectorForNode } from './di';
-import { assertPreviousIsParent, getOrCreateCurrentQueries, isContentQueryHost, store, storeCleanupWithContext } from './instructions';
+import { NG_ELEMENT_ID } from './fields';
+import { _getViewData, assertPreviousIsParent, getOrCreateCurrentQueries, store, storeCleanupWithContext } from './instructions';
 import { unusedValueExportToPlacateAjd as unused1 } from './interfaces/definition';
 import { unusedValueExportToPlacateAjd as unused2 } from './interfaces/injector';
 import { unusedValueExportToPlacateAjd as unused3 } from './interfaces/node';
 import { unusedValueExportToPlacateAjd as unused4 } from './interfaces/query';
-import { DIRECTIVES, TVIEW } from './interfaces/view';
-import { flatten } from './util';
+import { TVIEW } from './interfaces/view';
+import { flatten, isContentQueryHost } from './util';
+import { createElementRef, createTemplateRef } from './view_engine_compatibility';
 /** @type {?} */
 const unusedValueToPlacateAjd = unused1 + unused2 + unused3 + unused4;
 /**
@@ -142,21 +145,21 @@ export class LQueries_ {
         insertView(index, this.deep);
     }
     /**
-     * @param {?} node
+     * @param {?} tNode
      * @return {?}
      */
-    addNode(node) {
-        add(this.deep, node);
-        if (isContentQueryHost(node.tNode)) {
-            add(this.shallow, node);
-            if (node.tNode.parent && isContentQueryHost(node.tNode.parent)) {
+    addNode(tNode) {
+        add(this.deep, tNode);
+        if (isContentQueryHost(tNode)) {
+            add(this.shallow, tNode);
+            if (tNode.parent && isContentQueryHost(tNode.parent)) {
                 // if node has a content query and parent also has a content query
                 // both queries need to check this node for shallow matches
-                add(/** @type {?} */ ((this.parent)).shallow, node);
+                add(/** @type {?} */ ((this.parent)).shallow, tNode);
             }
             return this.parent;
         }
-        isRootNodeOfQuery(node.tNode) && add(this.shallow, node);
+        isRootNodeOfQuery(tNode) && add(this.shallow, tNode);
         return this;
     }
     /**
@@ -285,58 +288,76 @@ function getIdxOfMatchingSelector(tNode, selector) {
 /**
  * Iterates over all the directives for a node and returns index of a directive for a given type.
  *
- * @param {?} node Node on which directives are present.
+ * @param {?} tNode TNode on which directives are present.
+ * @param {?} currentView The view we are currently processing
  * @param {?} type Type of a directive to look for.
  * @return {?} Index of a found directive or null when none found.
  */
-function getIdxOfMatchingDirective(node, type) {
+function getIdxOfMatchingDirective(tNode, currentView, type) {
     /** @type {?} */
-    const defs = /** @type {?} */ ((node.view[TVIEW].directives));
-    /** @type {?} */
-    const flags = node.tNode.flags;
-    /** @type {?} */
-    const count = flags & 4095 /* DirectiveCountMask */;
-    /** @type {?} */
-    const start = flags >> 15 /* DirectiveStartingIndexShift */;
-    /** @type {?} */
-    const end = start + count;
-    for (let i = start; i < end; i++) {
+    const defs = currentView[TVIEW].data;
+    if (defs) {
         /** @type {?} */
-        const def = /** @type {?} */ (defs[i]);
-        if (def.type === type && def.diPublic) {
-            return i;
+        const flags = tNode.flags;
+        /** @type {?} */
+        const count = flags & 4095 /* DirectiveCountMask */;
+        /** @type {?} */
+        const start = flags >> 15 /* DirectiveStartingIndexShift */;
+        /** @type {?} */
+        const end = start + count;
+        for (let i = start; i < end; i++) {
+            /** @type {?} */
+            const def = /** @type {?} */ (defs[i]);
+            if (def.type === type && def.diPublic) {
+                return i;
+            }
         }
     }
     return null;
 }
 /**
- * @param {?} nodeInjector
- * @param {?} node
+ * @param {?} tNode
+ * @param {?} currentView
  * @param {?} read
- * @param {?} directiveIdx
  * @return {?}
  */
-function readFromNodeInjector(nodeInjector, node, read, directiveIdx) {
-    if (read instanceof ReadFromInjectorFn) {
-        return read.read(nodeInjector, node, directiveIdx);
+function queryRead(tNode, currentView, read) {
+    /** @type {?} */
+    const factoryFn = (/** @type {?} */ (read))[NG_ELEMENT_ID];
+    if (typeof factoryFn === 'function') {
+        return factoryFn();
     }
     else {
         /** @type {?} */
-        const matchingIdx = getIdxOfMatchingDirective(node, /** @type {?} */ (read));
+        const matchingIdx = getIdxOfMatchingDirective(tNode, currentView, /** @type {?} */ (read));
         if (matchingIdx !== null) {
-            return /** @type {?} */ ((node.view[DIRECTIVES]))[matchingIdx];
+            return currentView[matchingIdx];
         }
+    }
+    return null;
+}
+/**
+ * @param {?} tNode
+ * @param {?} currentView
+ * @return {?}
+ */
+function queryReadByTNodeType(tNode, currentView) {
+    if (tNode.type === 3 /* Element */ || tNode.type === 4 /* ElementContainer */) {
+        return createElementRef(ViewEngine_ElementRef, tNode, currentView);
+    }
+    if (tNode.type === 0 /* Container */) {
+        return createTemplateRef(ViewEngine_TemplateRef, ViewEngine_ElementRef, tNode, currentView);
     }
     return null;
 }
 /**
  * @param {?} query
- * @param {?} node
+ * @param {?} tNode
  * @return {?}
  */
-function add(query, node) {
+function add(query, tNode) {
     /** @type {?} */
-    const nodeInjector = getOrCreateNodeInjectorForNode(/** @type {?} */ (node));
+    const currentView = _getViewData();
     while (query) {
         /** @type {?} */
         const predicate = query.predicate;
@@ -344,13 +365,9 @@ function add(query, node) {
         const type = predicate.type;
         if (type) {
             /** @type {?} */
-            const directiveIdx = getIdxOfMatchingDirective(node, type);
-            if (directiveIdx !== null) {
-                /** @type {?} */
-                const result = readFromNodeInjector(nodeInjector, node, predicate.read || type, directiveIdx);
-                if (result !== null) {
-                    addMatch(query, result);
-                }
+            const result = queryRead(tNode, currentView, predicate.read || type);
+            if (result !== null) {
+                addMatch(query, result);
             }
         }
         else {
@@ -358,13 +375,23 @@ function add(query, node) {
             const selector = /** @type {?} */ ((predicate.selector));
             for (let i = 0; i < selector.length; i++) {
                 /** @type {?} */
-                const directiveIdx = getIdxOfMatchingSelector(node.tNode, selector[i]);
+                const directiveIdx = getIdxOfMatchingSelector(tNode, selector[i]);
                 if (directiveIdx !== null) {
-                    // a node is matching a predicate - determine what to read
-                    // note that queries using name selector must specify read strategy
-                    ngDevMode && assertDefined(predicate.read, 'the node should have a predicate');
                     /** @type {?} */
-                    const result = readFromNodeInjector(nodeInjector, node, /** @type {?} */ ((predicate.read)), directiveIdx);
+                    let result = null;
+                    if (predicate.read) {
+                        result = queryRead(tNode, currentView, predicate.read);
+                    }
+                    else {
+                        if (directiveIdx > -1) {
+                            result = currentView[directiveIdx];
+                        }
+                        else {
+                            // if read token and / or strategy is not specified,
+                            // detect it using appropriate tNode type
+                            result = queryReadByTNodeType(tNode, currentView);
+                        }
+                    }
                     if (result !== null) {
                         addMatch(query, result);
                     }
@@ -563,7 +590,9 @@ export const QueryList = /** @type {?} */ (QueryList_);
  * @param {?=} read What to save in the query
  * @return {?} QueryList<T>
  */
-export function query(memoryIndex, predicate, descend, read) {
+export function query(memoryIndex, predicate, descend, 
+// TODO: "read" should be an AbstractType (FW-486)
+read) {
     ngDevMode && assertPreviousIsParent();
     /** @type {?} */
     const queryList = new QueryList();

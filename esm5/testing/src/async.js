@@ -1,4 +1,8 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -9,7 +13,7 @@ import { asyncFallback } from './async_fallback';
 /**
  * Wraps a test function in an asynchronous test zone. The test will automatically
  * complete when all asynchronous calls within this zone are done. Can be used
- * to wrap an {@link inject} call.
+ * to wrap an {\@link inject} call.
  *
  * Example:
  *
@@ -22,8 +26,11 @@ import { asyncFallback } from './async_fallback';
  * ```
  *
  *
+ * @param {?} fn
+ * @return {?}
  */
 export function async(fn) {
+    /** @type {?} */
     var _Zone = typeof Zone !== 'undefined' ? Zone : null;
     if (!_Zone) {
         return function () {
@@ -31,6 +38,7 @@ export function async(fn) {
                 'Please make sure that your environment includes zone.js/dist/zone.js');
         };
     }
+    /** @type {?} */
     var asyncTest = _Zone && _Zone[_Zone.__symbol__('asyncTest')];
     if (typeof asyncTest === 'function') {
         return asyncTest(fn);

@@ -9,6 +9,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
+import { getInjectableDef } from '../di/defs';
 import { resolveForwardRef } from '../di/forward_ref';
 import { INJECTOR, Injector, setCurrentInjector } from '../di/injector';
 import { APP_ROOT } from '../di/scope';
@@ -125,6 +126,8 @@ export function resolveNgModuleDep(data, depDef, notFoundValue) {
         }
         /** @type {?} */
         var providerDef = data._def.providersByKey[tokenKey_1];
+        /** @type {?} */
+        var injectableDef = void 0;
         if (providerDef) {
             /** @type {?} */
             var providerInstance = data._providers[providerDef.index];
@@ -134,11 +137,7 @@ export function resolveNgModuleDep(data, depDef, notFoundValue) {
             }
             return providerInstance === UNDEFINED_VALUE ? undefined : providerInstance;
         }
-        else if (depDef.token.ngInjectableDef && targetsModule(data, depDef.token.ngInjectableDef)) {
-            /** @type {?} */
-            var injectableDef = /** @type {?} */ (depDef.token.ngInjectableDef);
-            /** @type {?} */
-            var key = tokenKey_1;
+        else if ((injectableDef = getInjectableDef(depDef.token)) && targetsModule(data, injectableDef)) {
             /** @type {?} */
             var index = data._providers.length;
             data._def.providersByKey[depDef.tokenKey] = {

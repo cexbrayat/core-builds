@@ -1,4 +1,8 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -6,6 +10,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { ɵstringify as stringify } from '@angular/core';
+/** @typedef {?} */
+var StringMap;
+/** @type {?} */
 var _nextReferenceId = 0;
 var MetadataOverrider = /** @class */ (function () {
     function MetadataOverrider() {
@@ -15,10 +22,29 @@ var MetadataOverrider = /** @class */ (function () {
      * Creates a new instance for the given metadata class
      * based on an old instance and overrides.
      */
-    MetadataOverrider.prototype.overrideMetadata = function (metadataClass, oldMetadata, override) {
+    /**
+     * Creates a new instance for the given metadata class
+     * based on an old instance and overrides.
+     * @template C, T
+     * @param {?} metadataClass
+     * @param {?} oldMetadata
+     * @param {?} override
+     * @return {?}
+     */
+    MetadataOverrider.prototype.overrideMetadata = /**
+     * Creates a new instance for the given metadata class
+     * based on an old instance and overrides.
+     * @template C, T
+     * @param {?} metadataClass
+     * @param {?} oldMetadata
+     * @param {?} override
+     * @return {?}
+     */
+    function (metadataClass, oldMetadata, override) {
+        /** @type {?} */
         var props = {};
         if (oldMetadata) {
-            _valueProps(oldMetadata).forEach(function (prop) { return props[prop] = oldMetadata[prop]; });
+            _valueProps(oldMetadata).forEach(function (prop) { return props[prop] = (/** @type {?} */ (oldMetadata))[prop]; });
         }
         if (override.set) {
             if (override.remove || override.add) {
@@ -32,14 +58,26 @@ var MetadataOverrider = /** @class */ (function () {
         if (override.add) {
             addMetadata(props, override.add);
         }
-        return new metadataClass(props);
+        return new metadataClass(/** @type {?} */ (props));
     };
     return MetadataOverrider;
 }());
 export { MetadataOverrider };
+if (false) {
+    /** @type {?} */
+    MetadataOverrider.prototype._references;
+}
+/**
+ * @param {?} metadata
+ * @param {?} remove
+ * @param {?} references
+ * @return {?}
+ */
 function removeMetadata(metadata, remove, references) {
+    /** @type {?} */
     var removeObjects = new Set();
     var _loop_1 = function (prop) {
+        /** @type {?} */
         var removeValue = remove[prop];
         if (removeValue instanceof Array) {
             removeValue.forEach(function (value) { removeObjects.add(_propHashKey(prop, value, references)); });
@@ -52,6 +90,7 @@ function removeMetadata(metadata, remove, references) {
         _loop_1(prop);
     }
     var _loop_2 = function (prop) {
+        /** @type {?} */
         var propValue = metadata[prop];
         if (propValue instanceof Array) {
             metadata[prop] = propValue.filter(function (value) { return !removeObjects.has(_propHashKey(prop, value, references)); });
@@ -66,9 +105,16 @@ function removeMetadata(metadata, remove, references) {
         _loop_2(prop);
     }
 }
+/**
+ * @param {?} metadata
+ * @param {?} add
+ * @return {?}
+ */
 function addMetadata(metadata, add) {
     for (var prop in add) {
+        /** @type {?} */
         var addValue = add[prop];
+        /** @type {?} */
         var propValue = metadata[prop];
         if (propValue != null && propValue instanceof Array) {
             metadata[prop] = propValue.concat(addValue);
@@ -78,12 +124,24 @@ function addMetadata(metadata, add) {
         }
     }
 }
+/**
+ * @param {?} metadata
+ * @param {?} set
+ * @return {?}
+ */
 function setMetadata(metadata, set) {
     for (var prop in set) {
         metadata[prop] = set[prop];
     }
 }
+/**
+ * @param {?} propName
+ * @param {?} propValue
+ * @param {?} references
+ * @return {?}
+ */
 function _propHashKey(propName, propValue, references) {
+    /** @type {?} */
     var replacer = function (key, value) {
         if (typeof value === 'function') {
             value = _serializeReference(value, references);
@@ -92,7 +150,13 @@ function _propHashKey(propName, propValue, references) {
     };
     return propName + ":" + JSON.stringify(propValue, replacer);
 }
+/**
+ * @param {?} ref
+ * @param {?} references
+ * @return {?}
+ */
 function _serializeReference(ref, references) {
+    /** @type {?} */
     var id = references.get(ref);
     if (!id) {
         id = "" + stringify(ref) + _nextReferenceId++;
@@ -100,7 +164,12 @@ function _serializeReference(ref, references) {
     }
     return id;
 }
+/**
+ * @param {?} obj
+ * @return {?}
+ */
 function _valueProps(obj) {
+    /** @type {?} */
     var props = [];
     // regular public props
     Object.keys(obj).forEach(function (prop) {
@@ -108,10 +177,11 @@ function _valueProps(obj) {
             props.push(prop);
         }
     });
-    // getters
+    /** @type {?} */
     var proto = obj;
     while (proto = Object.getPrototypeOf(proto)) {
         Object.keys(proto).forEach(function (protoProp) {
+            /** @type {?} */
             var desc = Object.getOwnPropertyDescriptor(proto, protoProp);
             if (!protoProp.startsWith('_') && desc && 'get' in desc) {
                 props.push(protoProp);

@@ -12,12 +12,11 @@
 /**
  * @template T
  * @param {?} objWithPropertyToExtract
- * @param {?} target
  * @return {?}
  */
-export function getClosureSafeProperty(objWithPropertyToExtract, target) {
+export function getClosureSafeProperty(objWithPropertyToExtract) {
     for (let key in objWithPropertyToExtract) {
-        if (objWithPropertyToExtract[key] === target) {
+        if (objWithPropertyToExtract[key] === /** @type {?} */ (getClosureSafeProperty)) {
             return key;
         }
     }

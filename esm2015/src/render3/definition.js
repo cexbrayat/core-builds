@@ -12,10 +12,11 @@
 import './ng_dev_mode';
 import { ChangeDetectionStrategy } from '../change_detection/constants';
 import { ViewEncapsulation } from '../metadata/view';
+import { NG_COMPONENT_DEF, NG_DIRECTIVE_DEF, NG_MODULE_DEF, NG_PIPE_DEF } from './fields';
 /** @type {?} */
-const EMPTY = {};
+export const EMPTY = {};
 /** @type {?} */
-const EMPTY_ARRAY = [];
+export const EMPTY_ARRAY = [];
 if (typeof ngDevMode !== 'undefined' && ngDevMode) {
     Object.freeze(EMPTY);
     Object.freeze(EMPTY_ARRAY);
@@ -54,6 +55,13 @@ export function defineComponent(componentDefinition) {
     /** @type {?} */
     const styles = componentDefinition.styles || EMPTY_ARRAY;
     /** @type {?} */
+    const animations = componentDefinition.animations || null;
+    /** @type {?} */
+    let data = componentDefinition.data || {};
+    if (animations) {
+        data["animations"] = animations;
+    }
+    /** @type {?} */
     const def = {
         type: type,
         diPublic: null,
@@ -88,7 +96,7 @@ export function defineComponent(componentDefinition) {
         selectors: componentDefinition.selectors,
         viewQuery: componentDefinition.viewQuery || null,
         features: componentDefinition.features || null,
-        data: componentDefinition.data || EMPTY,
+        data,
         // TODO(misko): convert ViewEncapsulation into const enum so that it can be used directly in the
         // next line. Also `None` should be 0 not 2.
         encapsulation,
@@ -107,11 +115,11 @@ export function defineComponent(componentDefinition) {
  */
 export function extractDirectiveDef(type) {
     /** @type {?} */
-    const def = type.ngComponentDef || type.ngDirectiveDef;
+    const def = getComponentDef(type) || getDirectiveDef(type);
     if (ngDevMode && !def) {
         throw new Error(`'${type.name}' is neither 'ComponentType' or 'DirectiveType'.`);
     }
-    return def;
+    return /** @type {?} */ ((def));
 }
 /**
  * @param {?} type
@@ -119,11 +127,11 @@ export function extractDirectiveDef(type) {
  */
 export function extractPipeDef(type) {
     /** @type {?} */
-    const def = type.ngPipeDef;
+    const def = getPipeDef(type);
     if (ngDevMode && !def) {
         throw new Error(`'${type.name}' is not a 'PipeType'.`);
     }
-    return def;
+    return /** @type {?} */ ((def));
 }
 /**
  * @template T
@@ -274,5 +282,40 @@ export function definePipe(pipeDef) {
         pure: pipeDef.pure !== false,
         onDestroy: pipeDef.type.prototype.ngOnDestroy || null
     })));
+}
+/**
+ * The following getter methods retrieve the definition form the type. Currently the retrieval
+ * honors inheritance, but in the future we may change the rule to require that definitions are
+ * explicit. This would require some sort of migration strategy.
+ * @template T
+ * @param {?} type
+ * @return {?}
+ */
+export function getComponentDef(type) {
+    return (/** @type {?} */ (type))[NG_COMPONENT_DEF] || null;
+}
+/**
+ * @template T
+ * @param {?} type
+ * @return {?}
+ */
+export function getDirectiveDef(type) {
+    return (/** @type {?} */ (type))[NG_DIRECTIVE_DEF] || null;
+}
+/**
+ * @template T
+ * @param {?} type
+ * @return {?}
+ */
+export function getPipeDef(type) {
+    return (/** @type {?} */ (type))[NG_PIPE_DEF] || null;
+}
+/**
+ * @template T
+ * @param {?} type
+ * @return {?}
+ */
+export function getNgModuleDef(type) {
+    return (/** @type {?} */ (type))[NG_MODULE_DEF] || null;
 }
 //# sourceMappingURL=definition.js.map

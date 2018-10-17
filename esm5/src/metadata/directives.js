@@ -11,7 +11,8 @@
  */
 import * as tslib_1 from "tslib";
 import { ChangeDetectionStrategy } from '../change_detection/constants';
-import { R3_COMPILE_COMPONENT, R3_COMPILE_DIRECTIVE, R3_COMPILE_PIPE } from '../ivy_switch';
+import { R3_COMPILE_COMPONENT, R3_COMPILE_DIRECTIVE, R3_COMPILE_PIPE } from '../ivy_switch/compiler/index';
+import { NG_BASE_DEF } from '../render3/fields';
 import { makeDecorator, makePropDecorator } from '../util/decorators';
 import { fillProperties } from '../util/property';
 /**
@@ -144,7 +145,7 @@ export function InputDecorator() { }
 var initializeBaseDef = function (target) {
     /** @type {?} */
     var constructor = target.constructor;
-    /** @type {?} */
+    /** @nocollapse @type {?} */
     var inheritedBaseDef = constructor.ngBaseDef;
     /** @type {?} */
     var baseDef = constructor.ngBaseDef = {
@@ -160,10 +161,6 @@ var initializeBaseDef = function (target) {
 };
 var ɵ0 = initializeBaseDef;
 /** *
- * Used to get the minified alias of ngBaseDef
-  @type {?} */
-var NG_BASE_DEF = Object.keys({ ngBaseDef: true })[0];
-/** *
  * Does the work of creating the `ngBaseDef` property for the \@Input and \@Output decorators.
  * \@param key "inputs" or "outputs"
   @type {?} */
@@ -178,7 +175,7 @@ var updateBaseDefFromIOProp = function (getProp) {
         if (!constructor.hasOwnProperty(NG_BASE_DEF)) {
             initializeBaseDef(target);
         }
-        /** @type {?} */
+        /** @nocollapse @type {?} */
         var baseDef = constructor.ngBaseDef;
         /** @type {?} */
         var defProp = getProp(baseDef);

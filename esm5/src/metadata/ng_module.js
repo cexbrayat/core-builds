@@ -9,7 +9,7 @@
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-import { R3_COMPILE_NGMODULE } from '../ivy_switch';
+import { R3_COMPILE_NGMODULE } from '../ivy_switch/compiler/index';
 import { makeDecorator } from '../util/decorators';
 /**
  * Represents the expansion of an `NgModule` into its scopes.
@@ -27,8 +27,8 @@ NgModuleTransitiveScopes.prototype.compilation;
 /** @type {?} */
 NgModuleTransitiveScopes.prototype.exported;
 /** @typedef {?} */
-var NgModuleDefInternal;
-export { NgModuleDefInternal };
+var NgModuleDefWithMeta;
+export { NgModuleDefWithMeta };
 /**
  * Runtime link information for NgModules.
  *
@@ -39,7 +39,7 @@ export { NgModuleDefInternal };
  * never create the object directly since the shape of this object
  * can change between versions.
  * @record
- * @template T, Declarations, Imports, Exports
+ * @template T
  */
 export function NgModuleDef() { }
 /**

@@ -1,4 +1,8 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -10,8 +14,14 @@ import { RendererFactory2, getDebugNode } from '@angular/core';
  * Fixture for debugging and testing a component.
  *
  *
+ * @template T
  */
 export class ComponentFixture {
+    /**
+     * @param {?} componentRef
+     * @param {?} ngZone
+     * @param {?} _autoDetect
+     */
     constructor(componentRef, ngZone, _autoDetect) {
         this.componentRef = componentRef;
         this.ngZone = ngZone;
@@ -26,7 +36,7 @@ export class ComponentFixture {
         this._onErrorSubscription = null;
         this.changeDetectorRef = componentRef.changeDetectorRef;
         this.elementRef = componentRef.location;
-        this.debugElement = getDebugNode(this.elementRef.nativeElement);
+        this.debugElement = /** @type {?} */ (getDebugNode(this.elementRef.nativeElement));
         this.componentInstance = componentRef.instance;
         this.nativeElement = this.elementRef.nativeElement;
         this.componentRef = componentRef;
@@ -57,7 +67,7 @@ export class ComponentFixture {
                             scheduleMicroTask(() => {
                                 if (!ngZone.hasPendingMacrotasks) {
                                     if (this._promise !== null) {
-                                        this._resolve(true);
+                                        /** @type {?} */ ((this._resolve))(true);
                                         this._resolve = null;
                                         this._promise = null;
                                     }
@@ -71,6 +81,10 @@ export class ComponentFixture {
             });
         }
     }
+    /**
+     * @param {?} checkNoChanges
+     * @return {?}
+     */
     _tick(checkNoChanges) {
         this.changeDetectorRef.detectChanges();
         if (checkNoChanges) {
@@ -79,6 +93,8 @@ export class ComponentFixture {
     }
     /**
      * Trigger a change detection cycle for the component.
+     * @param {?=} checkNoChanges
+     * @return {?}
      */
     detectChanges(checkNoChanges = true) {
         if (this.ngZone != null) {
@@ -93,12 +109,15 @@ export class ComponentFixture {
     }
     /**
      * Do a change detection run to make sure there were no changes.
+     * @return {?}
      */
     checkNoChanges() { this.changeDetectorRef.checkNoChanges(); }
     /**
      * Set whether the fixture should autodetect changes.
      *
      * Also runs detectChanges once so that any existing change is detected.
+     * @param {?=} autoDetect
+     * @return {?}
      */
     autoDetectChanges(autoDetect = true) {
         if (this.ngZone == null) {
@@ -110,13 +129,15 @@ export class ComponentFixture {
     /**
      * Return whether the fixture is currently stable or has async tasks that have not been completed
      * yet.
+     * @return {?}
      */
-    isStable() { return this._isStable && !this.ngZone.hasPendingMacrotasks; }
+    isStable() { return this._isStable && !/** @type {?} */ ((this.ngZone)).hasPendingMacrotasks; }
     /**
      * Get a promise that resolves when the fixture is stable.
      *
      * This can be used to resume testing after events have triggered asynchronous activity or
      * asynchronous change detection.
+     * @return {?}
      */
     whenStable() {
         if (this.isStable()) {
@@ -130,16 +151,21 @@ export class ComponentFixture {
             return this._promise;
         }
     }
+    /**
+     * @return {?}
+     */
     _getRenderer() {
         if (this._renderer === undefined) {
             this._renderer = this.componentRef.injector.get(RendererFactory2, null);
         }
-        return this._renderer;
+        return /** @type {?} */ (this._renderer);
     }
     /**
-      * Get a promise that resolves when the ui state is stable following animations.
-      */
+     * Get a promise that resolves when the ui state is stable following animations.
+     * @return {?}
+     */
     whenRenderingDone() {
+        /** @type {?} */
         const renderer = this._getRenderer();
         if (renderer && renderer.whenRenderingDone) {
             return renderer.whenRenderingDone();
@@ -148,6 +174,7 @@ export class ComponentFixture {
     }
     /**
      * Trigger component destruction.
+     * @return {?}
      */
     destroy() {
         if (!this._isDestroyed) {
@@ -172,6 +199,61 @@ export class ComponentFixture {
         }
     }
 }
+if (false) {
+    /**
+     * The DebugElement associated with the root element of this component.
+     * @type {?}
+     */
+    ComponentFixture.prototype.debugElement;
+    /**
+     * The instance of the root component class.
+     * @type {?}
+     */
+    ComponentFixture.prototype.componentInstance;
+    /**
+     * The native element at the root of the component.
+     * @type {?}
+     */
+    ComponentFixture.prototype.nativeElement;
+    /**
+     * The ElementRef for the element at the root of the component.
+     * @type {?}
+     */
+    ComponentFixture.prototype.elementRef;
+    /**
+     * The ChangeDetectorRef for the component
+     * @type {?}
+     */
+    ComponentFixture.prototype.changeDetectorRef;
+    /** @type {?} */
+    ComponentFixture.prototype._renderer;
+    /** @type {?} */
+    ComponentFixture.prototype._isStable;
+    /** @type {?} */
+    ComponentFixture.prototype._isDestroyed;
+    /** @type {?} */
+    ComponentFixture.prototype._resolve;
+    /** @type {?} */
+    ComponentFixture.prototype._promise;
+    /** @type {?} */
+    ComponentFixture.prototype._onUnstableSubscription;
+    /** @type {?} */
+    ComponentFixture.prototype._onStableSubscription;
+    /** @type {?} */
+    ComponentFixture.prototype._onMicrotaskEmptySubscription;
+    /** @type {?} */
+    ComponentFixture.prototype._onErrorSubscription;
+    /** @type {?} */
+    ComponentFixture.prototype.componentRef;
+    /** @type {?} */
+    ComponentFixture.prototype.ngZone;
+    /** @type {?} */
+    ComponentFixture.prototype._autoDetect;
+}
+/**
+ * @param {?} fn
+ * @return {?}
+ */
 function scheduleMicroTask(fn) {
     Zone.current.scheduleMicroTask('scheduleMicrotask', fn);
 }

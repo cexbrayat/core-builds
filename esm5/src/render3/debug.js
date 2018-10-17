@@ -10,11 +10,9 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import * as tslib_1 from "tslib";
-import { Injector } from '../di/injector';
 import { DebugRendererFactory2 } from '../view/services';
-import * as di from './di';
-import { NG_HOST_SYMBOL, _getViewData } from './instructions';
-import { CONTEXT, DIRECTIVES, TVIEW } from './interfaces/view';
+import { getHostComponent, getInjector, getLocalRefs, loadContext } from './discovery_utils';
+import { TVIEW } from './interfaces/view';
 /**
  * Adapts the DebugRendererFactory2 to create a DebugRenderer2 specific for IVY.
  *
@@ -43,7 +41,7 @@ Render3DebugRendererFactory2 = /** @class */ (function (_super) {
     function (element, renderData) {
         /** @type {?} */
         var renderer = /** @type {?} */ (_super.prototype.createRenderer.call(this, element, renderData));
-        renderer.debugContextFactory = function () { return new Render3DebugContext(_getViewData()); };
+        renderer.debugContextFactory = function (nativeElement) { return new Render3DebugContext(nativeElement); };
         return renderer;
     };
     return Render3DebugRendererFactory2;
@@ -65,16 +63,22 @@ var /**
  * Used in tests to retrieve information those nodes.
  */
 Render3DebugContext = /** @class */ (function () {
-    function Render3DebugContext(viewData) {
-        this.viewData = viewData;
-        // The LNode will be created next and appended to viewData
-        this.nodeIndex = viewData ? viewData.length : null;
+    function Render3DebugContext(_nativeNode) {
+        this._nativeNode = _nativeNode;
     }
+    Object.defineProperty(Render3DebugContext.prototype, "nodeIndex", {
+        get: /**
+         * @return {?}
+         */
+        function () { return loadContext(this._nativeNode).nodeIndex; },
+        enumerable: true,
+        configurable: true
+    });
     Object.defineProperty(Render3DebugContext.prototype, "view", {
         get: /**
          * @return {?}
          */
-        function () { return this.viewData; },
+        function () { return loadContext(this._nativeNode).lViewData; },
         enumerable: true,
         configurable: true
     });
@@ -82,18 +86,7 @@ Render3DebugContext = /** @class */ (function () {
         get: /**
          * @return {?}
          */
-        function () {
-            if (this.nodeIndex !== null) {
-                /** @type {?} */
-                var lElementNode = this.view[this.nodeIndex];
-                /** @type {?} */
-                var nodeInjector = lElementNode.nodeInjector;
-                if (nodeInjector) {
-                    return new di.NodeInjector(nodeInjector);
-                }
-            }
-            return Injector.NULL;
-        },
+        function () { return getInjector(this._nativeNode); },
         enumerable: true,
         configurable: true
     });
@@ -101,48 +94,35 @@ Render3DebugContext = /** @class */ (function () {
         get: /**
          * @return {?}
          */
-        function () {
-            // TODO(vicb): why/when
-            if (this.nodeIndex === null) {
-                return null;
-            }
-            /** @type {?} */
-            var tView = this.view[TVIEW];
-            /** @type {?} */
-            var components = tView.components;
-            return (components && components.indexOf(this.nodeIndex) == -1) ?
-                null :
-                this.view[this.nodeIndex].data[CONTEXT];
-        },
+        function () { return getHostComponent(this._nativeNode); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Render3DebugContext.prototype, "providerTokens", {
-        // TODO(vicb): add view providers when supported
         get: /**
          * @return {?}
          */
         function () {
             /** @type {?} */
-            var matchedDirectives = [];
-            // TODO(vicb): why/when
-            if (this.nodeIndex === null) {
-                return matchedDirectives;
-            }
+            var lDebugCtx = loadContext(this._nativeNode);
             /** @type {?} */
-            var directives = this.view[DIRECTIVES];
-            if (directives) {
+            var lViewData = lDebugCtx.lViewData;
+            /** @type {?} */
+            var tNode = /** @type {?} */ (lViewData[TVIEW].data[lDebugCtx.nodeIndex]);
+            /** @type {?} */
+            var directivesCount = tNode.flags & 4095 /* DirectiveCountMask */;
+            if (directivesCount > 0) {
                 /** @type {?} */
-                var currentNode = this.view[this.nodeIndex];
-                for (var dirIndex = 0; dirIndex < directives.length; dirIndex++) {
-                    /** @type {?} */
-                    var directive = directives[dirIndex];
-                    if (directive[NG_HOST_SYMBOL] === currentNode) {
-                        matchedDirectives.push(directive.constructor);
-                    }
-                }
+                var directiveIdxStart = tNode.flags >> 15 /* DirectiveStartingIndexShift */;
+                /** @type {?} */
+                var directiveIdxEnd = directiveIdxStart + directivesCount;
+                /** @type {?} */
+                var viewDirectiveDefs = this.view[TVIEW].data;
+                /** @type {?} */
+                var directiveDefs = /** @type {?} */ (viewDirectiveDefs.slice(directiveIdxStart, directiveIdxEnd));
+                return directiveDefs.map(function (directiveDef) { return directiveDef.type; });
             }
-            return matchedDirectives;
+            return [];
         },
         enumerable: true,
         configurable: true
@@ -151,29 +131,21 @@ Render3DebugContext = /** @class */ (function () {
         get: /**
          * @return {?}
          */
-        function () {
-            // TODO(vicb): implement retrieving references
-            throw new Error('Not implemented yet in ivy');
-        },
+        function () { return getLocalRefs(this._nativeNode); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Render3DebugContext.prototype, "context", {
+        // TODO(pk): check previous implementation and re-implement
         get: /**
          * @return {?}
          */
-        function () {
-            if (this.nodeIndex === null) {
-                return null;
-            }
-            /** @type {?} */
-            var lNode = this.view[this.nodeIndex];
-            return lNode.view[CONTEXT];
-        },
+        function () { throw new Error('Not implemented in ivy'); },
         enumerable: true,
         configurable: true
     });
     Object.defineProperty(Render3DebugContext.prototype, "componentRenderElement", {
+        // TODO(pk): check previous implementation and re-implement
         get: /**
          * @return {?}
          */
@@ -182,6 +154,7 @@ Render3DebugContext = /** @class */ (function () {
         configurable: true
     });
     Object.defineProperty(Render3DebugContext.prototype, "renderNode", {
+        // TODO(pk): check previous implementation and re-implement
         get: /**
          * @return {?}
          */
@@ -189,7 +162,7 @@ Render3DebugContext = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    // TODO(vicb): check previous implementation
+    // TODO(pk): check previous implementation and re-implement
     /**
      * @param {?} console
      * @param {...?} values
@@ -211,8 +184,6 @@ Render3DebugContext = /** @class */ (function () {
 }());
 if (false) {
     /** @type {?} */
-    Render3DebugContext.prototype.nodeIndex;
-    /** @type {?} */
-    Render3DebugContext.prototype.viewData;
+    Render3DebugContext.prototype._nativeNode;
 }
 //# sourceMappingURL=debug.js.map

@@ -1,4 +1,8 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
@@ -8,16 +12,40 @@
 import * as tslib_1 from "tslib";
 import { Component, Directive, NgModule, Pipe, ɵReflectionCapabilities as ReflectionCapabilities } from '@angular/core';
 import { MetadataOverrider } from './metadata_overrider';
+/** @type {?} */
 var reflection = new ReflectionCapabilities();
 /**
- * Allows to override ivy metadata for tests (via the `TestBed`).
+ * Base interface to resolve `\@Component`, `\@Directive`, `\@Pipe` and `\@NgModule`.
+ * @record
+ * @template T
  */
-var OverrideResolver = /** @class */ (function () {
+export function Resolver() { }
+/** @type {?} */
+Resolver.prototype.resolve;
+/**
+ * Allows to override ivy metadata for tests (via the `TestBed`).
+ * @abstract
+ * @template T
+ */
+var /**
+ * Allows to override ivy metadata for tests (via the `TestBed`).
+ * @abstract
+ * @template T
+ */
+OverrideResolver = /** @class */ (function () {
     function OverrideResolver() {
         this.overrides = new Map();
         this.resolved = new Map();
     }
-    OverrideResolver.prototype.setOverrides = function (overrides) {
+    /**
+     * @param {?} overrides
+     * @return {?}
+     */
+    OverrideResolver.prototype.setOverrides = /**
+     * @param {?} overrides
+     * @return {?}
+     */
+    function (overrides) {
         var _this = this;
         this.overrides.clear();
         overrides.forEach(function (_a) {
@@ -25,17 +53,36 @@ var OverrideResolver = /** @class */ (function () {
             return _this.overrides.set(type, override);
         });
     };
-    OverrideResolver.prototype.getAnnotation = function (type) {
+    /**
+     * @param {?} type
+     * @return {?}
+     */
+    OverrideResolver.prototype.getAnnotation = /**
+     * @param {?} type
+     * @return {?}
+     */
+    function (type) {
         var _this = this;
         return reflection.annotations(type).find(function (a) { return a instanceof _this.type; }) || null;
     };
-    OverrideResolver.prototype.resolve = function (type) {
+    /**
+     * @param {?} type
+     * @return {?}
+     */
+    OverrideResolver.prototype.resolve = /**
+     * @param {?} type
+     * @return {?}
+     */
+    function (type) {
+        /** @type {?} */
         var resolved = this.resolved.get(type) || null;
         if (!resolved) {
             resolved = this.getAnnotation(type);
             if (resolved) {
+                /** @type {?} */
                 var override = this.overrides.get(type);
                 if (override) {
+                    /** @type {?} */
                     var overrider = new MetadataOverrider();
                     resolved = overrider.overrideMetadata(this.type, resolved, override);
                 }
@@ -46,13 +93,27 @@ var OverrideResolver = /** @class */ (function () {
     };
     return OverrideResolver;
 }());
+if (false) {
+    /** @type {?} */
+    OverrideResolver.prototype.overrides;
+    /** @type {?} */
+    OverrideResolver.prototype.resolved;
+    /**
+     * @abstract
+     * @return {?}
+     */
+    OverrideResolver.prototype.type = function () { };
+}
 var DirectiveResolver = /** @class */ (function (_super) {
     tslib_1.__extends(DirectiveResolver, _super);
     function DirectiveResolver() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Object.defineProperty(DirectiveResolver.prototype, "type", {
-        get: function () { return Directive; },
+        get: /**
+         * @return {?}
+         */
+        function () { return Directive; },
         enumerable: true,
         configurable: true
     });
@@ -65,7 +126,10 @@ var ComponentResolver = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Object.defineProperty(ComponentResolver.prototype, "type", {
-        get: function () { return Component; },
+        get: /**
+         * @return {?}
+         */
+        function () { return Component; },
         enumerable: true,
         configurable: true
     });
@@ -78,7 +142,10 @@ var PipeResolver = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Object.defineProperty(PipeResolver.prototype, "type", {
-        get: function () { return Pipe; },
+        get: /**
+         * @return {?}
+         */
+        function () { return Pipe; },
         enumerable: true,
         configurable: true
     });
@@ -91,7 +158,10 @@ var NgModuleResolver = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Object.defineProperty(NgModuleResolver.prototype, "type", {
-        get: function () { return NgModule; },
+        get: /**
+         * @return {?}
+         */
+        function () { return NgModule; },
         enumerable: true,
         configurable: true
     });

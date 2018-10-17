@@ -1,15 +1,20 @@
 /**
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
+ */
+/**
  * @license
  * Copyright Google Inc. All Rights Reserved.
  *
  * Use of this source code is governed by an MIT-style license that can be
  * found in the LICENSE file at https://angular.io/license
  */
-const _global = (typeof window === 'undefined' ? global : window);
+/** @type {?} */
+const _global = /** @type {?} */ ((typeof window === 'undefined' ? global : window));
 /**
  * Wraps a test function in an asynchronous test zone. The test will automatically
  * complete when all asynchronous calls within this zone are done. Can be used
- * to wrap an {@link inject} call.
+ * to wrap an {\@link inject} call.
  *
  * Example:
  *
@@ -22,6 +27,8 @@ const _global = (typeof window === 'undefined' ? global : window);
  * ```
  *
  *
+ * @param {?} fn
+ * @return {?}
  */
 export function asyncFallback(fn) {
     // If we're running using the Jasmine test framework, adapt to call the 'done'
@@ -37,7 +44,7 @@ export function asyncFallback(fn) {
             }
             runInTestZone(fn, this, done, (err) => {
                 if (typeof err === 'string') {
-                    return done.fail(new Error(err));
+                    return done.fail(new Error(/** @type {?} */ (err)));
                 }
                 else {
                     done.fail(err);
@@ -55,25 +62,37 @@ export function asyncFallback(fn) {
         });
     };
 }
+/**
+ * @param {?} fn
+ * @param {?} context
+ * @param {?} finishCallback
+ * @param {?} failCallback
+ * @return {?}
+ */
 function runInTestZone(fn, context, finishCallback, failCallback) {
+    /** @type {?} */
     const currentZone = Zone.current;
-    const AsyncTestZoneSpec = Zone['AsyncTestZoneSpec'];
+    /** @type {?} */
+    const AsyncTestZoneSpec = (/** @type {?} */ (Zone))['AsyncTestZoneSpec'];
     if (AsyncTestZoneSpec === undefined) {
         throw new Error('AsyncTestZoneSpec is needed for the async() test helper but could not be found. ' +
             'Please make sure that your environment includes zone.js/dist/async-test.js');
     }
-    const ProxyZoneSpec = Zone['ProxyZoneSpec'];
+    /** @type {?} */
+    const ProxyZoneSpec = /** @type {?} */ ((/** @type {?} */ (Zone))['ProxyZoneSpec']);
     if (ProxyZoneSpec === undefined) {
         throw new Error('ProxyZoneSpec is needed for the async() test helper but could not be found. ' +
             'Please make sure that your environment includes zone.js/dist/proxy.js');
     }
+    /** @type {?} */
     const proxyZoneSpec = ProxyZoneSpec.get();
     ProxyZoneSpec.assertPresent();
-    // We need to create the AsyncTestZoneSpec outside the ProxyZone.
-    // If we do it in ProxyZone then we will get to infinite recursion.
+    /** @type {?} */
     const proxyZone = Zone.current.getZoneWith('ProxyZoneSpec');
+    /** @type {?} */
     const previousDelegate = proxyZoneSpec.getDelegate();
     proxyZone.parent.run(() => {
+        /** @type {?} */
         const testZoneSpec = new AsyncTestZoneSpec(() => {
             // Need to restore the original zone.
             currentZone.run(() => {

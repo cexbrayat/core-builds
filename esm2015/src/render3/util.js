@@ -2,11 +2,20 @@
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
-import { devModeEqual } from '../change_detection/change_detection_util';
-import { assertLessThan } from './assert';
-import { HEADER_OFFSET } from './interfaces/view';
 /**
- * Returns wether the values are different from a change detection stand point.
+ * @license
+ * Copyright Google Inc. All Rights Reserved.
+ *
+ * Use of this source code is governed by an MIT-style license that can be
+ * found in the LICENSE file at https://angular.io/license
+ */
+import { devModeEqual } from '../change_detection/change_detection_util';
+import { assertDefined, assertLessThan } from './assert';
+import { ACTIVE_INDEX } from './interfaces/container';
+import { MONKEY_PATCH_KEY_NAME } from './interfaces/context';
+import { CONTEXT, FLAGS, HEADER_OFFSET, HOST, PARENT, TVIEW } from './interfaces/view';
+/**
+ * Returns whether the values are different from a change detection stand point.
  *
  * Constraints are relaxed in checkNoChanges mode. See `devModeEqual` for details.
  * @param {?} a
@@ -34,15 +43,6 @@ export function stringify(value) {
     if (value == null)
         return '';
     return '' + value;
-}
-/**
- *  Function that throws a "not implemented" error so it's clear certain
- *  behaviors/methods aren't yet ready.
- *
- * @return {?} Not implemented error
- */
-export function notImplemented() {
-    return new Error('NotImplemented');
 }
 /**
  * Flattens an array in non-recursive way. Input arrays are not modified.
@@ -74,7 +74,7 @@ export function flatten(list) {
     return result;
 }
 /**
- * Retrieves a value from any `LViewData`.
+ * Retrieves a value from any `LViewData` or `TData`.
  * @template T
  * @param {?} index
  * @param {?} arr
@@ -93,24 +93,123 @@ export function assertDataInRangeInternal(index, arr) {
     assertLessThan(index, arr ? arr.length : 0, 'index expected to be a valid data index');
 }
 /**
- * Retrieves an element value from the provided `viewData`.
+ * Takes the value of a slot in `LViewData` and returns the element node.
  *
- * Elements that are read may be wrapped in a style context,
- * therefore reading the value may involve unwrapping that.
+ * Normally, element nodes are stored flat, but if the node has styles/classes on it,
+ * it might be wrapped in a styling context. Or if that node has a directive that injects
+ * ViewContainerRef, it may be wrapped in an LContainer. Or if that node is a component,
+ * it will be wrapped in LViewData. It could even have all three, so we keep looping
+ * until we find something that isn't an array.
+ *
+ * @param {?} value The initial value in `LViewData`
+ * @return {?}
+ */
+export function readElementValue(value) {
+    while (Array.isArray(value)) {
+        value = /** @type {?} */ (value[HOST]);
+    }
+    return value;
+}
+/**
+ * Retrieves an element value from the provided `viewData`, by unwrapping
+ * from any containers, component views, or style contexts.
  * @param {?} index
  * @param {?} arr
  * @return {?}
  */
-export function loadElementInternal(index, arr) {
+export function getNativeByIndex(index, arr) {
+    return readElementValue(arr[index + HEADER_OFFSET]);
+}
+/**
+ * @param {?} tNode
+ * @param {?} hostView
+ * @return {?}
+ */
+export function getNativeByTNode(tNode, hostView) {
+    return readElementValue(hostView[tNode.index]);
+}
+/**
+ * @param {?} index
+ * @param {?} view
+ * @return {?}
+ */
+export function getTNode(index, view) {
+    return /** @type {?} */ (view[TVIEW].data[index + HEADER_OFFSET]);
+}
+/**
+ * @param {?} nodeIndex
+ * @param {?} hostView
+ * @return {?}
+ */
+export function getComponentViewByIndex(nodeIndex, hostView) {
     /** @type {?} */
-    const value = loadInternal(index, arr);
-    return readElementValue(value);
+    const slotValue = hostView[nodeIndex];
+    return slotValue.length >= HEADER_OFFSET ? slotValue : slotValue[HOST];
+}
+/**
+ * @param {?} tNode
+ * @return {?}
+ */
+export function isContentQueryHost(tNode) {
+    return (tNode.flags & 16384 /* hasContentQuery */) !== 0;
+}
+/**
+ * @param {?} tNode
+ * @return {?}
+ */
+export function isComponent(tNode) {
+    return (tNode.flags & 4096 /* isComponent */) === 4096 /* isComponent */;
 }
 /**
  * @param {?} value
  * @return {?}
  */
-export function readElementValue(value) {
-    return /** @type {?} */ ((Array.isArray(value) ? (/** @type {?} */ ((value)))[0] : value));
+export function isLContainer(value) {
+    // Styling contexts are also arrays, but their first index contains an element node
+    return Array.isArray(value) && typeof value[ACTIVE_INDEX] === 'number';
+}
+/**
+ * Retrieve the root view from any component by walking the parent `LViewData` until
+ * reaching the root `LViewData`.
+ *
+ * @param {?} target
+ * @return {?}
+ */
+export function getRootView(target) {
+    ngDevMode && assertDefined(target, 'component');
+    /** @type {?} */
+    let lViewData = Array.isArray(target) ? (/** @type {?} */ (target)) : /** @type {?} */ ((readPatchedLViewData(target)));
+    while (lViewData && !(lViewData[FLAGS] & 64 /* IsRoot */)) {
+        lViewData = /** @type {?} */ ((lViewData[PARENT]));
+    }
+    return lViewData;
+}
+/**
+ * @param {?} viewOrComponent
+ * @return {?}
+ */
+export function getRootContext(viewOrComponent) {
+    return /** @type {?} */ (getRootView(viewOrComponent)[CONTEXT]);
+}
+/**
+ * Returns the monkey-patch value data present on the target (which could be
+ * a component, directive or a DOM node).
+ * @param {?} target
+ * @return {?}
+ */
+export function readPatchedData(target) {
+    return target[MONKEY_PATCH_KEY_NAME];
+}
+/**
+ * @param {?} target
+ * @return {?}
+ */
+export function readPatchedLViewData(target) {
+    /** @type {?} */
+    const value = readPatchedData(target);
+    if (value) {
+        return Array.isArray(value) ? value : (/** @type {?} */ (value)).lViewData;
+    }
+    return null;
 }
 //# sourceMappingURL=util.js.map

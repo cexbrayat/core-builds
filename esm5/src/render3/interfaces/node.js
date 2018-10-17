@@ -33,133 +33,6 @@ var TNodeFlags = {
     DirectiveStartingIndexShift: 15,
 };
 export { TNodeFlags };
-/**
- * LNode is an internal data structure which is used for the incremental DOM algorithm.
- * The "L" stands for "Logical" to differentiate between `RNodes` (actual rendered DOM
- * node) and our logical representation of DOM nodes, `LNodes`.
- *
- * The data structure is optimized for speed and size.
- *
- * In order to be fast, all subtypes of `LNode` should have the same shape.
- * Because size of the `LNode` matters, many fields have multiple roles depending
- * on the `LNode` subtype.
- *
- * See: https://en.wikipedia.org/wiki/Inline_caching#Monomorphic_inline_caching
- *
- * NOTE: This is a private data structure and should not be exported by any of the
- * instructions.
- * @record
- */
-export function LNode() { }
-/**
- * The associated DOM node. Storing this allows us to:
- *  - append children to their element parents in the DOM (e.g. `parent.native.appendChild(...)`)
- *  - retrieve the sibling elements of text nodes whose creation / insertion has been delayed
- * @type {?}
- */
-LNode.prototype.native;
-/**
- * If regular LElementNode, LTextNode, and LProjectionNode then `data` will be null.
- * If LElementNode with component, then `data` contains LViewData.
- * If LViewNode, then `data` contains the LViewData.
- * If LContainerNode, then `data` contains LContainer.
- * @type {?}
- */
-LNode.prototype.data;
-/**
- * Each node belongs to a view.
- *
- * When the injector is walking up a tree, it needs access to the `directives` (part of view).
- * @type {?}
- */
-LNode.prototype.view;
-/**
- * The injector associated with this node. Necessary for DI.
- * @type {?}
- */
-LNode.prototype.nodeInjector;
-/**
- * Pointer to the corresponding TNode object, which stores static
- * data about this node.
- * @type {?}
- */
-LNode.prototype.tNode;
-/**
- * A pointer to an LContainerNode created by directives requesting ViewContainerRef
- * @type {?}
- */
-LNode.prototype.dynamicLContainerNode;
-/**
- * LNode representing an element.
- * @record
- */
-export function LElementNode() { }
-/**
- * The DOM element associated with this node.
- * @type {?}
- */
-LElementNode.prototype.native;
-/**
- * If Component then data has LView (light DOM)
- * @type {?}
- */
-LElementNode.prototype.data;
-/**
- * LNode representing <ng-container>.
- * @record
- */
-export function LElementContainerNode() { }
-/**
- * The DOM comment associated with this node.
- * @type {?}
- */
-LElementContainerNode.prototype.native;
-/** @type {?} */
-LElementContainerNode.prototype.data;
-/**
- * LNode representing a #text node.
- * @record
- */
-export function LTextNode() { }
-/**
- * The text node associated with this node.
- * @type {?}
- */
-LTextNode.prototype.native;
-/** @type {?} */
-LTextNode.prototype.data;
-/** @type {?} */
-LTextNode.prototype.dynamicLContainerNode;
-/**
- * Abstract node which contains root nodes of a view.
- * @record
- */
-export function LViewNode() { }
-/** @type {?} */
-LViewNode.prototype.native;
-/** @type {?} */
-LViewNode.prototype.data;
-/** @type {?} */
-LViewNode.prototype.dynamicLContainerNode;
-/**
- * Abstract node container which contains other views.
- * @record
- */
-export function LContainerNode() { }
-/** @type {?} */
-LContainerNode.prototype.native;
-/** @type {?} */
-LContainerNode.prototype.data;
-/**
- * @record
- */
-export function LProjectionNode() { }
-/** @type {?} */
-LProjectionNode.prototype.native;
-/** @type {?} */
-LProjectionNode.prototype.data;
-/** @type {?} */
-LProjectionNode.prototype.dynamicLContainerNode;
 /** @enum {number} */
 var AttributeMarker = {
     /**
@@ -181,7 +54,7 @@ export { AttributeMarker };
 var TAttributes;
 export { TAttributes };
 /**
- * LNode binding data (flyweight) for a particular node that is shared between all templates
+ * Binding data (flyweight) for a particular node that is shared between all templates
  * of a specific type.
  *
  * If a property is:
@@ -199,15 +72,30 @@ export function TNode() { }
  */
 TNode.prototype.type;
 /**
- * Index of the TNode in TView.data and corresponding LNode in LView.data.
+ * Index of the TNode in TView.data and corresponding native element in LViewData.
  *
- * This is necessary to get from any TNode to its corresponding LNode when
+ * This is necessary to get from any TNode to its corresponding native element when
  * traversing the node tree.
  *
  * If index is -1, this is a dynamically created container node or embedded view node.
  * @type {?}
  */
 TNode.prototype.index;
+/**
+ * The index of the closest injector in this node's LViewData.
+ *
+ * If the index === -1, there is no injector on this node or any ancestor node in this view.
+ *
+ * If the index !== -1, it is the index of this node's injector OR the index of a parent injector
+ * in the same view. We pass the parent injector index down the node tree of a view so it's
+ * possible to find the parent injector without walking a potentially deep node tree. Injector
+ * indices are not set across view boundaries because there could be multiple component hosts.
+ *
+ * If tNode.injectorIndex === tNode.parent.injectorIndex, then the index belongs to a parent
+ * injector.
+ * @type {?}
+ */
+TNode.prototype.injectorIndex;
 /**
  * This number stores two values using its bits:
  *
@@ -283,7 +171,7 @@ TNode.prototype.outputs;
 /**
  * The TView or TViews attached to this node.
  *
- * If this TNode corresponds to an LContainerNode with inline views, the container will
+ * If this TNode corresponds to an LContainer with inline views, the container will
  * need to store separate static data for each of its view blocks (TView[]). Otherwise,
  * nodes in inline views with the same index as nodes in their parent views will overwrite
  * each other, as they are in the same template.
@@ -295,10 +183,10 @@ TNode.prototype.outputs;
  *   [{tagName: 'div', attrs: ...}, null],     // V(0) TView
  *   [{tagName: 'button', attrs ...}, null]    // V(1) TView
  *
- * If this TNode corresponds to an LContainerNode with a template (e.g. structural
+ * If this TNode corresponds to an LContainer with a template (e.g. structural
  * directive), the template's TView will be stored here.
  *
- * If this TNode corresponds to an LElementNode, tViews will be null .
+ * If this TNode corresponds to an element, tViews will be null .
  * @type {?}
  */
 TNode.prototype.tViews;
@@ -332,11 +220,6 @@ TNode.prototype.child;
  * @type {?}
  */
 TNode.prototype.parent;
-/**
- * A pointer to a TContainerNode created by directives requesting ViewContainerRef
- * @type {?}
- */
-TNode.prototype.dynamicContainerNode;
 /**
  * If this node is part of an i18n block, it indicates whether this container is part of the DOM
  * If this node is not part of an i18n block, this field is null.
@@ -384,7 +267,7 @@ TNode.prototype.stylingTemplate;
  */
 TNode.prototype.projection;
 /**
- * Static data for an LElementNode
+ * Static data for an element
  * @record
  */
 export function TElementNode() { }
@@ -398,7 +281,7 @@ TElementNode.prototype.child;
 /**
  * Element nodes will have parents unless they are the first node of a component or
  * embedded view (which means their parent is in a different view and must be
- * retrieved using LView.node).
+ * retrieved using viewData[HOST_NODE]).
  * @type {?}
  */
 TElementNode.prototype.parent;
@@ -412,7 +295,7 @@ TElementNode.prototype.tViews;
  */
 TElementNode.prototype.projection;
 /**
- * Static data for an LTextNode
+ * Static data for a text node
  * @record
  */
 export function TTextNode() { }
@@ -435,7 +318,7 @@ TTextNode.prototype.tViews;
 /** @type {?} */
 TTextNode.prototype.projection;
 /**
- * Static data for an LContainerNode
+ * Static data for an LContainer
  * @record
  */
 export function TContainerNode() { }
@@ -462,7 +345,25 @@ TContainerNode.prototype.tViews;
 /** @type {?} */
 TContainerNode.prototype.projection;
 /**
- * Static data for an LViewNode
+ * Static data for an <ng-container>
+ * @record
+ */
+export function TElementContainerNode() { }
+/**
+ * Index in the LViewData[] array.
+ * @type {?}
+ */
+TElementContainerNode.prototype.index;
+/** @type {?} */
+TElementContainerNode.prototype.child;
+/** @type {?} */
+TElementContainerNode.prototype.parent;
+/** @type {?} */
+TElementContainerNode.prototype.tViews;
+/** @type {?} */
+TElementContainerNode.prototype.projection;
+/**
+ * Static data for a view
  * @record
  */
 export function TViewNode() { }
@@ -518,8 +419,8 @@ export { InitialInputs };
 /** @type {?} */
 export var unusedValueExportToPlacateAjd = 1;
 /** @typedef {?} */
-var LNodeWithLocalRefs;
-export { LNodeWithLocalRefs };
+var TNodeWithLocalRefs;
+export { TNodeWithLocalRefs };
 /** @typedef {?} */
 var LocalRefExtractor;
 export { LocalRefExtractor };

@@ -56,8 +56,8 @@ export function PipeType() { }
 /** @type {?} */
 PipeType.prototype.ngPipeDef;
 /** @typedef {?} */
-var DirectiveDefInternal;
-export { DirectiveDefInternal };
+var DirectiveDefWithMeta;
+export { DirectiveDefWithMeta };
 /**
  * Runtime information for classes that are inherited by components or directives
  * that aren't defined as components or directives.
@@ -90,7 +90,6 @@ BaseDef.prototype.declaredInputs;
  * @type {?}
  */
 BaseDef.prototype.outputs;
-// unsupported: template constraints.
 /**
  * Runtime link information for Directives.
  *
@@ -105,7 +104,7 @@ BaseDef.prototype.outputs;
  *
  * See: {\@link defineDirective}
  * @record
- * @template T, Selector
+ * @template T
  */
 export function DirectiveDef() { }
 /**
@@ -184,9 +183,8 @@ DirectiveDef.prototype.onDestroy;
  */
 DirectiveDef.prototype.features;
 /** @typedef {?} */
-var ComponentDefInternal;
-export { ComponentDefInternal };
-// unsupported: template constraints.
+var ComponentDefWithMeta;
+export { ComponentDefWithMeta };
 /**
  * Runtime link information for Components.
  *
@@ -199,7 +197,7 @@ export { ComponentDefInternal };
  *
  * See: {\@link defineComponent}
  * @record
- * @template T, Selector
+ * @template T
  */
 export function ComponentDef() { }
 /**
@@ -288,7 +286,6 @@ ComponentDef.prototype.directiveDefs;
  * @type {?}
  */
 ComponentDef.prototype.pipeDefs;
-// unsupported: template constraints.
 /**
  * Runtime link information for Pipes.
  *
@@ -301,7 +298,7 @@ ComponentDef.prototype.pipeDefs;
  *
  * See: {\@link definePipe}
  * @record
- * @template T, S
+ * @template T
  */
 export function PipeDef() { }
 /**
@@ -327,8 +324,8 @@ PipeDef.prototype.pure;
 /** @type {?} */
 PipeDef.prototype.onDestroy;
 /** @typedef {?} */
-var PipeDefInternal;
-export { PipeDefInternal };
+var PipeDefWithMeta;
+export { PipeDefWithMeta };
 /** @typedef {?} */
 var DirectiveDefFeature;
 export { DirectiveDefFeature };
@@ -347,6 +344,9 @@ export { DirectiveTypesOrFactory };
 /** @typedef {?} */
 var DirectiveTypeList;
 export { DirectiveTypeList };
+/** @typedef {?} */
+var HostBindingsFunction;
+export { HostBindingsFunction };
 /** @typedef {?} */
 var PipeDefListOrFactory;
 export { PipeDefListOrFactory };

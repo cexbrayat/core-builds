@@ -10,6 +10,7 @@
  * found in the LICENSE file at https://angular.io/license
  */
 import { InjectionToken } from '../di/injection_token';
+import { R3_RENDERER2_FACTORY } from '../ivy_switch/runtime/index';
 /**
  * @deprecated Use `RendererType2` (and `Renderer2`) instead.
  */
@@ -46,11 +47,11 @@ if (false) {
     RenderComponentType.prototype.animations;
 }
 /**
- * @deprecated Debug info is handeled internally in the view engine now.
+ * @deprecated Debug info is handled internally in the view engine now.
  * @abstract
  */
 var /**
- * @deprecated Debug info is handeled internally in the view engine now.
+ * @deprecated Debug info is handled internally in the view engine now.
  * @abstract
  */
 RenderDebugInfo = /** @class */ (function () {
@@ -59,7 +60,7 @@ RenderDebugInfo = /** @class */ (function () {
     return RenderDebugInfo;
 }());
 /**
- * @deprecated Debug info is handeled internally in the view engine now.
+ * @deprecated Debug info is handled internally in the view engine now.
  * @abstract
  */
 export { RenderDebugInfo };
@@ -220,7 +221,7 @@ if (false) {
      * @abstract
      * @param {?} renderElement
      * @param {?} attributeName
-     * @param {?} attributeValue
+     * @param {?=} attributeValue
      * @return {?}
      */
     Renderer.prototype.setElementAttribute = function (renderElement, attributeName, attributeValue) { };
@@ -245,7 +246,7 @@ if (false) {
      * @abstract
      * @param {?} renderElement
      * @param {?} styleName
-     * @param {?} styleValue
+     * @param {?=} styleValue
      * @return {?}
      */
     Renderer.prototype.setElementStyle = function (renderElement, styleName, styleValue) { };
@@ -456,45 +457,22 @@ RendererStyleFlags2[RendererStyleFlags2.DashCase] = 'DashCase';
  * \@experimental
  * @abstract
  */
-var /**
- * Extend this base class to implement custom rendering. By default, Angular
- * renders a template into DOM. You can use custom rendering to intercept
- * rendering calls, or to render to something other than DOM.
- *
- * Create your custom renderer using `RendererFactory2`.
- *
- * Use a custom renderer to bypass Angular's templating and
- * make custom UI changes that can't be expressed declaratively.
- * For example if you need to set a property or an attribute whose name is
- * not statically known, use the `setProperty()` or
- * `setAttribute()` method.
- *
- * \@experimental
- * @abstract
- */
-Renderer2 = /** @class */ (function () {
+var Renderer2 = /** @class */ (function () {
     function Renderer2() {
     }
+    /**
+     * \@internal
+     */
+    Renderer2.__NG_ELEMENT_ID__ = function () { return R3_RENDERER2_FACTORY(); };
     return Renderer2;
 }());
-/**
- * Extend this base class to implement custom rendering. By default, Angular
- * renders a template into DOM. You can use custom rendering to intercept
- * rendering calls, or to render to something other than DOM.
- *
- * Create your custom renderer using `RendererFactory2`.
- *
- * Use a custom renderer to bypass Angular's templating and
- * make custom UI changes that can't be expressed declaratively.
- * For example if you need to set a property or an attribute whose name is
- * not statically known, use the `setProperty()` or
- * `setAttribute()` method.
- *
- * \@experimental
- * @abstract
- */
 export { Renderer2 };
 if (false) {
+    /**
+     * \@internal
+     * @type {?}
+     */
+    Renderer2.__NG_ELEMENT_ID__;
     /**
      * If null or undefined, the view engine won't call it.
      * This is used as a performance optimization for production mode.

@@ -191,7 +191,7 @@ InertBodyHelper = /** @class */ (function () {
             }
         }
         /** @type {?} */
-        var childNode = el.firstChild;
+        var childNode = /** @type {?} */ (el.firstChild);
         while (childNode) {
             if (childNode.nodeType === Node.ELEMENT_NODE)
                 this.stripCustomNsAttrs(/** @type {?} */ (childNode));
