@@ -1,19 +1,3 @@
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
- */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-/**
- * This file is used to control if the default rendering pipeline should be `ViewEngine` or `Ivy`.
- *
- * For more information on how to run and debug tests with either Ivy or View Engine (legacy),
- * please see [BAZEL.md](./docs/BAZEL.md).
- */
-export { R3_ELEMENT_REF_FACTORY__POST_NGCC__, R3_TEMPLATE_REF_FACTORY__POST_NGCC__, R3_CHANGE_DETECTOR_REF_FACTORY__POST_NGCC__, R3_VIEW_CONTAINER_REF_FACTORY__POST_NGCC__, R3_RENDERER2_FACTORY__POST_NGCC__, R3_ELEMENT_REF_FACTORY__PRE_NGCC__, R3_TEMPLATE_REF_FACTORY__PRE_NGCC__, R3_CHANGE_DETECTOR_REF_FACTORY__PRE_NGCC__, R3_VIEW_CONTAINER_REF_FACTORY__PRE_NGCC__, R3_RENDERER2_FACTORY__PRE_NGCC__, R3_ELEMENT_REF_FACTORY, R3_TEMPLATE_REF_FACTORY, R3_CHANGE_DETECTOR_REF_FACTORY, R3_VIEW_CONTAINER_REF_FACTORY, R3_RENDERER2_FACTORY } from './legacy';
-//# sourceMappingURL=index.js.map
+export * from './legacy';
+
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoiaW5kZXguanMiLCJzb3VyY2VSb290IjoiIiwic291cmNlcyI6WyIuLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi8uLi9nZW5maWxlcy9wYWNrYWdlcy9jb3JlL3NyYy9pdnlfc3dpdGNoL3J1bnRpbWUvaW5kZXgudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6IkFBQUEsY0FBYyxVQUFVLENBQUMiLCJzb3VyY2VzQ29udGVudCI6WyJleHBvcnQgKiBmcm9tICcuL2xlZ2FjeSc7XG4iXX0=

@@ -1,9 +1,10 @@
 /**
- * @license Angular v7.0.0-rc.1-1c561a833c
+ * @license Angular v7.0.0-rc.1+60.sha-6d3a45c.with-local-changes
  * (c) 2010-2018 Google, Inc. https://angular.io/
  * License: MIT
  */
-import { ApplicationInitStatus, Compiler, Component, Directive, Injectable, InjectionToken, Injector, NgModule, NgZone, Optional, Pipe, RendererFactory2, SkipSelf, getDebugNode, ɵAPP_ROOT, ɵReflectionCapabilities, ɵRender3ComponentFactory, ɵRender3DebugRendererFactory2, ɵRender3NgModuleRef, ɵWRAP_RENDERER_FACTORY2, ɵclearOverrides, ɵcompileComponent, ɵcompileDirective, ɵcompileNgModuleDefs, ɵcompilePipe, ɵgetInjectableDef, ɵivyEnabled, ɵoverrideComponentView, ɵoverrideProvider, ɵpatchComponentDefWithScope, ɵstringify } from '@angular/core';
+
+import { RendererFactory2, getDebugNode, ɵstringify, Component, Directive, NgModule, Pipe, ɵReflectionCapabilities, InjectionToken, Injector, ɵRender3ComponentFactory, ɵRender3DebugRendererFactory2, ɵRender3NgModuleRef, ɵWRAP_RENDERER_FACTORY2, ɵcompileComponent, ɵcompileDirective, ɵcompileNgModuleDefs, ɵcompilePipe, ɵgetInjectableDef, ɵpatchComponentDefWithScope, Compiler, Injectable, ApplicationInitStatus, NgZone, Optional, SkipSelf, ɵAPP_ROOT, ɵclearOverrides, ɵivyEnabled, ɵoverrideComponentView, ɵoverrideProvider } from '@angular/core';
 
 /**
  * @fileoverview added by tsickle
@@ -129,13 +130,6 @@ function runInTestZone(fn, context, finishCallback, failCallback) {
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
 /**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-/**
  * Wraps a test function in an asynchronous test zone. The test will automatically
  * complete when all asynchronous calls within this zone are done. Can be used
  * to wrap an {\@link inject} call.
@@ -177,13 +171,6 @@ function async(fn) {
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
- */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
  */
 /**
  * Fixture for debugging and testing a component.
@@ -397,11 +384,11 @@ function scheduleMicroTask(fn) {
  * fakeAsync has been moved to zone.js
  * this file is for fallback in case old version of zone.js is used
   @type {?} */
-const _Zone$1 = typeof Zone !== 'undefined' ? Zone : null;
+const _Zone = typeof Zone !== 'undefined' ? Zone : null;
 /** @type {?} */
-const FakeAsyncTestZoneSpec = _Zone$1 && _Zone$1['FakeAsyncTestZoneSpec'];
+const FakeAsyncTestZoneSpec = _Zone && _Zone['FakeAsyncTestZoneSpec'];
 /** @type {?} */
-const ProxyZoneSpec = _Zone$1 && _Zone$1['ProxyZoneSpec'];
+const ProxyZoneSpec = _Zone && _Zone['ProxyZoneSpec'];
 /** @type {?} */
 let _fakeAsyncTestZoneSpec = null;
 /**
@@ -546,9 +533,9 @@ function flushMicrotasksFallback() {
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
 /** @type {?} */
-const _Zone = typeof Zone !== 'undefined' ? Zone : null;
+const _Zone$1 = typeof Zone !== 'undefined' ? Zone : null;
 /** @type {?} */
-const fakeAsyncTestModule = _Zone && _Zone[_Zone.__symbol__('fakeAsyncTest')];
+const fakeAsyncTestModule = _Zone$1 && _Zone$1[_Zone$1.__symbol__('fakeAsyncTest')];
 /**
  * Clears out the shared fake async zone for a test.
  * To be called in a global `beforeEach`.
@@ -702,13 +689,6 @@ class AsyncTestCompleter {
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
- */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
  */
 /** @type {?} */
 let _nextReferenceId = 0;
@@ -868,21 +848,8 @@ function _valueProps(obj) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 /** @type {?} */
 const reflection = new ɵReflectionCapabilities();
-/**
- * Base interface to resolve `\@Component`, `\@Directive`, `\@Pipe` and `\@NgModule`.
- * @record
- * @template T
- */
-
 /**
  * Allows to override ivy metadata for tests (via the `TestBed`).
  * @abstract
@@ -961,13 +928,6 @@ class NgModuleResolver extends OverrideResolver {
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
 /**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-/**
  * An abstract class for inserting the root test component element in a platform independent way.
  *
  * \@experimental
@@ -987,24 +947,13 @@ const ComponentFixtureAutoDetect = new InjectionToken('ComponentFixtureAutoDetec
  * \@experimental
   @type {?} */
 const ComponentFixtureNoNgZone = new InjectionToken('ComponentFixtureNoNgZone');
-/**
- * Static methods implemented by the `TestBedViewEngine` and `TestBedRender3`
- * @record
- */
 
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 /** @type {?} */
-let _nextRootElementId$1 = 0;
+let _nextRootElementId = 0;
 /**
  * \@description
  * Configures and initializes environment for unit testing and provides methods for
@@ -1392,7 +1341,7 @@ class TestBedRender3 {
         /** @type {?} */
         const testComponentRenderer = this.get(TestComponentRenderer);
         /** @type {?} */
-        const rootElId = `root${_nextRootElementId$1++}`;
+        const rootElId = `root${_nextRootElementId++}`;
         testComponentRenderer.insertRootElement(rootElId);
         /** @nocollapse @type {?} */
         const componentDef = (/** @type {?} */ (type)).ngComponentDef;
@@ -1492,12 +1441,12 @@ class TestBedRender3 {
     }
 }
 /** @type {?} */
-let testBed$1;
+let testBed;
 /**
  * @return {?}
  */
 function _getTestBedRender3() {
-    return testBed$1 = testBed$1 || new TestBedRender3();
+    return testBed = testBed || new TestBedRender3();
 }
 /** @type {?} */
 const EMPTY_ARRAY = [];
@@ -1657,13 +1606,6 @@ function isNgModule(value) {
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
 /**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-/**
  * @return {?}
  */
 function unimplemented() {
@@ -1736,7 +1678,7 @@ class TestingCompiler extends Compiler {
     getComponentFromError(error) { throw unimplemented(); }
 }
 TestingCompiler.decorators = [
-    { type: Injectable },
+    { type: Injectable }
 ];
 /**
  * A factory for creating a Compiler
@@ -1751,17 +1693,10 @@ class TestingCompilerFactory {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 /** @type {?} */
 const UNDEFINED = new Object();
 /** @type {?} */
-let _nextRootElementId = 0;
+let _nextRootElementId$1 = 0;
 /**
  * \@description
  * Configures and initializes environment for unit testing and provides methods for
@@ -2285,7 +2220,7 @@ class TestBedViewEngine {
         /** @type {?} */
         const deps = (provider.deps || []).map((dep) => {
             /** @type {?} */
-            let depFlags = 0;
+            let depFlags = 0 /* None */;
             /** @type {?} */
             let depToken;
             if (Array.isArray(dep)) {
@@ -2343,7 +2278,7 @@ class TestBedViewEngine {
         /** @type {?} */
         const testComponentRenderer = this.get(TestComponentRenderer);
         /** @type {?} */
-        const rootElId = `root${_nextRootElementId++}`;
+        const rootElId = `root${_nextRootElementId$1++}`;
         testComponentRenderer.insertRootElement(rootElId);
         /** @type {?} */
         const initComponent = () => {
@@ -2377,12 +2312,12 @@ const TestBed = ɵivyEnabled ? /** @type {?} */ ((TestBedRender3)) : /** @type {
   @type {?} */
 const getTestBed = ɵivyEnabled ? _getTestBedRender3 : _getTestBedViewEngine;
 /** @type {?} */
-let testBed;
+let testBed$1;
 /**
  * @return {?}
  */
 function _getTestBedViewEngine() {
-    return testBed = testBed || new TestBedViewEngine();
+    return testBed$1 = testBed$1 || new TestBedViewEngine();
 }
 /**
  * Allows injecting dependencies in `beforeEach()` and `it()`.
@@ -2491,13 +2426,6 @@ function withModule(moduleDef, fn) {
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
 /** @type {?} */
 const _global$1 = /** @type {?} */ ((typeof window === 'undefined' ? global : window));
 // Reset the test providers and the fake async zone before each test.
@@ -2514,57 +2442,26 @@ const __core_private_testing_placeholder__ = '';
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
+
 /**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
+ * @fileoverview added by tsickle
+ * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
 
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-/**
- * @module
- * @description
- * Entry point for all public APIs of the core/testing package.
- */
-
-/**
- * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
- */
-/**
- * @license
- * Copyright Google Inc. All Rights Reserved.
- *
- * Use of this source code is governed by an MIT-style license that can be
- * found in the LICENSE file at https://angular.io/license
- */
-/**
- * @module
- * @description
- * Entry point for all public APIs of this package.
- */
-
 // This file only reexports content of the `src` folder. Keep it that way.
 
 /**
  * @fileoverview added by tsickle
  * @suppress {checkTypes,extraRequire,uselessCode} checked by tsc
  */
+
 /**
  * Generated bundle index. Do not edit.
  */
 
-export { TestBed, getTestBed, inject, InjectSetupWrapper, withModule, MetadataOverrider as ɵMetadataOverrider, async, ComponentFixture, resetFakeAsyncZone, fakeAsync, tick, flush, discardPeriodicTasks, flushMicrotasks, TestComponentRenderer, ComponentFixtureAutoDetect, ComponentFixtureNoNgZone, __core_private_testing_placeholder__, TestingCompiler as ɵTestingCompiler, TestingCompilerFactory as ɵTestingCompilerFactory, TestBedRender3 as ɵb, _getTestBedRender3 as ɵc, TestBedViewEngine as ɵa };
+export { TestBedRender3 as ɵangular_packages_core_testing_testing_b, _getTestBedRender3 as ɵangular_packages_core_testing_testing_c, TestBedViewEngine as ɵangular_packages_core_testing_testing_a, TestBed, getTestBed, inject, InjectSetupWrapper, withModule, MetadataOverrider as ɵMetadataOverrider, async, ComponentFixture, resetFakeAsyncZone, fakeAsync, tick, flush, discardPeriodicTasks, flushMicrotasks, TestComponentRenderer, ComponentFixtureAutoDetect, ComponentFixtureNoNgZone, __core_private_testing_placeholder__, TestingCompiler as ɵTestingCompiler, TestingCompilerFactory as ɵTestingCompilerFactory };
 //# sourceMappingURL=testing.js.map

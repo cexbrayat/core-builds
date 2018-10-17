@@ -25,15 +25,15 @@ declare abstract class OverrideResolver<T> implements Resolver<T> {
     resolve(type: Type<any>): T | null;
 }
 export declare class DirectiveResolver extends OverrideResolver<Directive> {
-    readonly type: import("../../../../dist/packages/core/src/metadata/directives").DirectiveDecorator;
+    readonly type: import("@angular/core/src/metadata/directives").DirectiveDecorator;
 }
 export declare class ComponentResolver extends OverrideResolver<Component> {
-    readonly type: import("../../../../dist/packages/core/src/metadata/directives").ComponentDecorator;
+    readonly type: import("@angular/core/src/metadata/directives").ComponentDecorator;
 }
 export declare class PipeResolver extends OverrideResolver<Pipe> {
-    readonly type: import("../../../../dist/packages/core/src/metadata/directives").PipeDecorator;
+    readonly type: import("@angular/core/src/metadata/directives").PipeDecorator;
 }
 export declare class NgModuleResolver extends OverrideResolver<NgModule> {
-    readonly type: import("../../../../dist/packages/core/src/metadata/ng_module").NgModuleDecorator;
+    readonly type: import("@angular/core/src/metadata/ng_module").NgModuleDecorator;
 }
 export {};

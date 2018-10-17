@@ -10,6 +10,7 @@
  * @description
  * Entry point from which you should import all public core APIs.
  */
+export * from './core_render3_private_export';
 export * from './metadata';
 export * from './version';
 export { TypeDecorator } from './util/decorators';
@@ -32,6 +33,5 @@ export { Type } from './type';
 export { EventEmitter } from './event_emitter';
 export { ErrorHandler } from './error_handler';
 export * from './core_private_export';
-export * from './core_render3_private_export';
 export { Sanitizer, SecurityContext } from './sanitization/security';
 export * from './codegen_private_exports';
